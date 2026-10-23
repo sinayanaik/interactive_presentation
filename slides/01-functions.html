@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An interactive first lesson in mathematical functions and learnable parameters.">
+  <title>Neural Networks, from the First Function</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    :root {
+      --ink: #17232d;
+      --muted: #65727a;
+      --paper: #f6f5ef;
+      --panel: #fffdf7;
+      --line: #d9ded7;
+      --orange: #e86f36;
+      --orange-dark: #b94c1d;
+      --blue: #2878b5;
+      --blue-soft: #dcecf7;
+      --green: #3f8068;
+      --yellow: #f3c969;
+      --shadow: 0 18px 45px rgba(23, 35, 45, .08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Manrope", sans-serif;
+      line-height: 1.55;
+    }
+    body::before { display: none; }
+    a { color: inherit; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .mono { font-family: "DM Mono", monospace; }
+    .wrap { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid rgba(217, 222, 215, .85);
+      background: rgba(246, 245, 239, .88);
+      backdrop-filter: blur(14px);
+    }
+    .topbar-inner { display: flex; align-items: center; justify-content: flex-end; min-height: 48px; gap: 24px; }
+    nav { display: none; }
+
+    .hero { position: relative; padding: 58px 0 36px; overflow: hidden; }
+    .hero-grid { display: block; }
+    .eyebrow, .kicker { color: var(--orange-dark); font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 800px; margin-bottom: 18px; font-size: clamp(40px, 6vw, 72px); line-height: .99; letter-spacing: -.075em; }
+    h1 em { color: var(--orange); font-style: normal; }
+    .hero-copy { max-width: 590px; color: var(--muted); font-size: 18px; }
+    .hero-copy strong { color: var(--ink); }
+    .hero-actions { display: none; }
+    .button { display: inline-flex; align-items: center; gap: 9px; padding: 12px 16px; border: 1px solid var(--ink); border-radius: 7px; text-decoration: none; font-size: 13px; font-weight: 800; transition: transform .2s, box-shadow .2s; }
+    .button:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(23, 35, 45, .12); }
+    .button.primary { color: white; border-color: var(--ink); background: var(--ink); }
+    .button.secondary { background: transparent; }
+    .hero-figure { display: none; }
+    .orbit { width: min(360px, 80vw); aspect-ratio: 1; border: 1px solid #c9d2cd; border-radius: 50%; transform: rotate(-15deg); }
+    .orbit::before, .orbit::after { content: ""; position: absolute; border: 1px solid #c9d2cd; border-radius: 50%; }
+    .orbit::before { width: 75%; height: 44%; transform: rotate(55deg); }
+    .orbit::after { width: 44%; height: 75%; transform: rotate(55deg); }
+    .orbit-center { position: absolute; width: 98px; height: 98px; display: grid; place-items: center; color: white; background: var(--blue); border-radius: 50%; box-shadow: 0 0 0 14px rgba(40,120,181,.1), 0 14px 25px rgba(40,120,181,.25); font-weight: 800; }
+    .node { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 0 7px rgba(232,111,54,.12); }
+    .node.one { top: 17%; right: 24%; } .node.two { bottom: 18%; left: 19%; background: var(--green); box-shadow: 0 0 0 7px rgba(63,128,104,.12); } .node.three { top: 28%; left: 12%; }
+
+    section { position: relative; padding: 64px 0; }
+    .section-heading { max-width: 650px; margin-bottom: 34px; }
+    h2 { margin-bottom: 12px; font-size: clamp(30px, 4vw, 48px); line-height: 1.05; letter-spacing: -.06em; }
+    .lead { color: var(--muted); font-size: 17px; }
+    .lesson-number { float: right; color: #a9b2ad; font-size: 14px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .panel { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); box-shadow: none; }
+    .panel-pad { padding: 28px; }
+    .panel h3 { margin-bottom: 8px; font-size: 20px; letter-spacing: -.04em; }
+    .small { color: var(--muted); font-size: 13px; }
+
+    .machine { display: grid; grid-template-columns: 1fr 1.5fr 1fr; align-items: center; gap: 18px; text-align: center; }
+    .machine-box { min-height: 145px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: white; }
+    .machine.is-changing .machine-box, .machine.is-changing .formula { animation: exchange .42s ease-out; }
+    .machine-box.input { border-color: #b6d4e8; background: var(--blue-soft); }
+    .machine-box.output { border-color: #f1c5af; background: #fff0e9; }
+    .machine-box strong { font-size: 27px; }
+    .machine-arrow { color: var(--orange); font-size: 25px; }
+    .machine-controls { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .example-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+    .example-button { border: 1px solid var(--line); border-radius: 5px; padding: 9px 12px; color: var(--muted); background: white; font-size: 12px; font-weight: 800; }
+    .example-button:hover, .example-button.active { color: white; border-color: var(--blue); background: var(--blue); }
+    .example-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .example-card { min-width: 0; padding: 22px; border: 1px solid var(--line); border-top: 4px solid var(--blue); border-radius: 8px; background: var(--panel); }
+    .example-card.unknown { border-top-color: var(--orange); }
+    .example-card h3 { margin: 3px 0 0; font-size: 20px; letter-spacing: -.04em; }
+    .example-head { display: flex; align-items: start; justify-content: space-between; gap: 10px; }
+    .type-label { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .example-description { min-height: 44px; margin: 10px 0 14px; color: var(--muted); font-size: 13px; }
+    .example-visual { height: 125px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; overflow: hidden; border-radius: 6px; background: #f0f5f3; }
+    .thermometer { position: relative; width: 24px; height: 93px; border: 3px solid var(--ink); border-radius: 14px 14px 12px 12px; background: white; }
+    .thermometer::before { content: ""; position: absolute; left: 50%; bottom: -17px; width: 38px; height: 38px; border: 3px solid var(--ink); border-radius: 50%; background: var(--heat-color, #e86f36); transform: translateX(-50%); }
+    .thermometer-fill { position: absolute; left: 5px; right: 5px; bottom: 6px; height: var(--heat-height, 45%); border-radius: 8px; background: var(--heat-color, #e86f36); }
+    .heat-map { width: 145px; height: 22px; margin-left: 30px; border: 1px solid var(--line); border-radius: 5px; background: linear-gradient(90deg, #2878b5, #dcecf7 45%, #e86f36); }
+    .route-map { width: 88%; height: 98px; }
+    .route-map svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    .route-road { fill: none; stroke: #aebdb5; stroke-width: 14; stroke-linecap: round; stroke-linejoin: round; }
+    .route-centerline { fill: none; stroke: #f7f5ec; stroke-width: 2; stroke-dasharray: 7 7; stroke-linecap: round; }
+    .route-travel { fill: none; stroke: var(--orange); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+    .route-marker { transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+    .route-marker rect { fill: var(--orange); stroke: white; stroke-width: 1.5; }
+    .route-marker circle { fill: var(--ink); }
+    .route-endpoint { fill: white; stroke: var(--green); stroke-width: 2; }
+    .route-label { fill: var(--ink); font: 700 9px "DM Mono", monospace; }
+    .area-visual { position: relative; width: var(--area-size, 55px); height: var(--area-size, 55px); border: 3px solid var(--blue); background: rgba(40,120,181,.2); transition: width .25s, height .25s; }
+    .area-visual::after { content: "area = side²"; position: absolute; left: 50%; top: 50%; width: 120px; color: var(--blue); font: 10px "DM Mono", monospace; transform: translate(-50%, -50%); }
+    .house-visual { width: 170px; height: 105px; }
+    .house-visual svg { display: block; width: 100%; height: 100%; }
+    .house-body { fill: #fff0e9; stroke: var(--orange-dark); stroke-width: 2; }
+    .house-roof { fill: #f3c969; stroke: var(--orange-dark); stroke-width: 2; stroke-linejoin: round; }
+    .house-window { fill: #dcecf7; stroke: var(--blue); stroke-width: 2; }
+    .house-door { fill: var(--orange-dark); }
+    .io-line { display: grid; grid-template-columns: 1fr auto 1fr; gap: 7px; align-items: center; margin-bottom: 13px; }
+    .io-chip { min-width: 0; padding: 7px 8px; overflow: hidden; border: 1px solid var(--line); border-radius: 5px; background: white; color: var(--muted); font: 11px "DM Mono", monospace; text-overflow: ellipsis; white-space: nowrap; }
+    .io-chip.output { border-color: #f1c5af; background: #fff0e9; color: var(--orange-dark); }
+    .io-arrow { color: var(--orange); font-size: 18px; }
+    .example-equation { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 13px; padding: 11px 12px; border-radius: 5px; color: #f7f5ec; background: var(--ink); font: 13px "DM Mono", monospace; }
+    .example-equation strong { color: var(--yellow); font-size: 16px; }
+    .example-card label { font-size: 12px; }
+    .example-card input[type="range"] { width: 52%; }
+    label { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 13px; }
+    input[type="range"] { width: 60%; accent-color: var(--orange); }
+    .value { min-width: 54px; color: var(--ink); font-weight: 800; text-align: right; }
+
+    .plot-wrap { position: relative; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: white; }
+    canvas { display: block; width: 100%; height: auto; }
+    .plot-caption { display: flex; justify-content: space-between; margin-top: 12px; color: var(--muted); font-size: 12px; }
+    .legend { display: inline-flex; align-items: center; gap: 7px; }
+    .legend-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--orange); }
+    .legend-line { width: 18px; border-top: 2px solid var(--blue); }
+
+    .concept-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .concept { padding: 20px; border-top: 3px solid var(--blue); background: rgba(255,253,247,.75); }
+    .concept:nth-child(2) { border-color: var(--orange); } .concept:nth-child(3) { border-color: var(--green); }
+    .concept h3 { font-size: 17px; }
+    .concept p { margin-bottom: 0; color: var(--muted); font-size: 14px; }
+    .formula { margin: 18px 0; padding: 17px; overflow-x: auto; border-radius: 7px; color: #f7f5ec; background: var(--ink); font-size: 17px; }
+    .flow-note { margin-top: 25px; color: var(--muted); font-size: 14px; }
+    .flow-note strong { color: var(--ink); }
+    .math-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 22px; align-items: start; }
+    .math-layout > * { min-width: 0; }
+    .math-card { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+    .math-card > * { margin-left: 26px; margin-right: 26px; }
+    .math-card h3 { margin-top: 26px; }
+    .equation { min-width: 0; overflow-x: auto; padding: 15px 0; border-top: 1px solid var(--line); color: var(--ink); }
+    .equation:first-of-type { border-top: 0; }
+    .live-update { margin: 0 26px 26px; padding: 15px; border-radius: 6px; color: #1f5578; background: var(--blue-soft); font-size: 13px; line-height: 1.8; }
+    .live-update strong { color: var(--ink); }
+    .landscape { padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: white; }
+    .landscape canvas { width: 100%; height: auto; cursor: crosshair; }
+    .landscape-caption { display: flex; justify-content: space-between; gap: 12px; margin: 12px 4px 2px; color: var(--muted); font-size: 12px; }
+    .gradient-key { display: inline-flex; align-items: center; gap: 8px; }
+    .gradient-key i { width: 52px; height: 8px; display: inline-block; border-radius: 4px; background: linear-gradient(90deg, #dcecf7, #2878b5, #17232d); }
+    .landscape-help { display: flex; gap: 14px; flex-wrap: wrap; margin: 10px 4px 0; color: var(--muted); font-size: 11px; }
+    .arrow-key { display: inline-flex; align-items: center; gap: 5px; }
+    .arrow-key i { width: 22px; border-top: 3px solid var(--orange); }
+    .arrow-key.down i { border-color: var(--blue); }
+    .hill-copy { margin: 20px 0 0; color: var(--muted); font-size: 14px; }
+    .combined-visual { display: grid; gap: 16px; }
+    .step-table-wrap { margin-top: 22px; overflow-x: auto; border: 1px solid var(--line); border-radius: 7px; }
+    .step-table { width: 100%; min-width: 420px; border-collapse: collapse; font: 11px "DM Mono", monospace; }
+    .step-table th, .step-table td { padding: 9px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+    .step-table th { color: var(--muted); background: #f2f5f1; font-size: 10px; font-weight: 500; }
+    .step-table th:first-child, .step-table td:first-child { text-align: left; }
+    .step-table tr:last-child td { border-bottom: 0; }
+
+    .learn-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 22px; align-items: stretch; }
+    .learn-controls { display: grid; gap: 14px; margin-top: 20px; }
+    .parameter { padding: 14px 16px; border: 1px solid var(--line); border-radius: 7px; background: white; }
+    .parameter label { margin-bottom: 9px; }
+    .parameter input[type="range"] { width: 100%; }
+    .metric { display: flex; align-items: baseline; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--line); }
+    .metric:last-child { border: 0; }
+    .metric span { color: var(--muted); font-size: 13px; }
+    .metric strong { font-size: 21px; }
+    .target-note { display: inline-block; margin-top: 15px; padding: 7px 10px; color: #876311; border-radius: 5px; background: #fff4cf; font-size: 12px; font-weight: 700; }
+    .step-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 18px; }
+    .step-button, .reset-button { width: 100%; border: 0; border-radius: 7px; padding: 13px; font-weight: 800; }
+    .step-button { color: white; background: var(--orange); }
+    .step-button:hover { background: var(--orange-dark); }
+    .reset-button { color: var(--ink); background: var(--blue-soft); }
+    .reset-button:hover { background: #c5e1f2; }
+    .jump-steps { display: flex; align-items: center; gap: 8px; }
+    .jump-steps span { color: var(--muted); font-size: 12px; }
+    .jump-steps input { width: 62px; padding: 11px 8px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: white; font: 700 13px "DM Mono", monospace; text-align: center; }
+
+    .callout { display: grid; grid-template-columns: auto 1fr; gap: 15px; align-items: start; padding: 22px; border-left: 4px solid var(--orange); background: #fff0e9; }
+    .callout-mark { color: var(--orange-dark); font-size: 24px; }
+    .callout p { margin: 0; font-size: 14px; }
+    footer { display: none; }
+    .reveal { animation: reveal .75s both; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes exchange { 0% { opacity: .35; transform: translateY(7px) scale(.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+    @media (max-width: 800px) {
+      .wrap { width: min(100% - 28px, 620px); }
+      nav { display: none; }
+      .hero { padding: 44px 0 28px; }
+      .hero-grid, .grid-2, .learn-grid { grid-template-columns: 1fr; gap: 24px; }
+      .math-layout { grid-template-columns: 1fr; }
+      .example-grid { grid-template-columns: 1fr; }
+      .hero-figure { min-height: 280px; }
+      section { padding: 62px 0; }
+      .machine { grid-template-columns: 1fr; gap: 7px; }
+      .machine-arrow { transform: rotate(90deg); }
+      .concept-row { grid-template-columns: 1fr; }
+      h1 { font-size: clamp(42px, 13vw, 66px); }
+    }
+  </style>
+</head>
+<body>
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="reveal">
+          <div class="eyebrow">Neural networks / chapter 01</div>
+          <h1>What does a function <em>do?</em></h1>
+          <p class="hero-copy">Try the examples below. Change the input, change the rule, and watch the output and graph move together.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="function">
+      <div class="wrap">
+        <div class="section-heading">
+          <div class="kicker">A rule you can use or discover</div>
+          <h2>A function is a rule that transforms an input.</h2>
+          <p class="lead"><strong>Simple definition:</strong> a function transforms an input into an output. In mathematical language, it relates one variable to another. Some functions are <strong>known</strong>; others are <strong>unknown</strong> and must be inferred from examples.</p>
+        </div>
+        <div class="example-grid">
+          <article class="example-card known">
+            <div class="example-head"><div><span class="type-label">Known function</span><h3>Temperature conversion</h3></div></div>
+            <p class="example-description">We know this rule from physics: Celsius can be converted to Fahrenheit exactly.</p>
+            <div class="example-visual"><div class="thermometer" id="thermometer"><div class="thermometer-fill"></div></div><div class="heat-map" aria-label="cold to hot color scale"></div></div>
+            <div class="io-line"><span class="io-chip">input: <span id="temperatureInput">20 °C</span></span><span class="io-arrow">→</span><span class="io-chip output">output: <span id="temperatureOutput">68 °F</span></span></div>
+            <div class="example-equation"><span>F(C) = 9/5 C + 32</span><strong>known rule</strong></div>
+            <label><span>temperature</span><input id="temperatureSlider" type="range" min="-20" max="40" step="1" value="20"></label>
+          </article>
+          <article class="example-card unknown">
+            <div class="example-head"><div><span class="type-label">Unknown function</span><h3>Taxi fare</h3></div></div>
+            <p class="example-description">A route app learns a fare rule from past trips: distance goes in, a price comes out.</p>
+            <div class="example-visual"><div class="route-map"><svg viewBox="0 0 260 100" role="img" aria-label="A car travelling from a start point to a moving end point along a winding road"><path id="routePath" class="route-road" d="M12 80 C55 5 88 93 130 46 S205 20 248 74"></path><path class="route-centerline" d="M12 80 C55 5 88 93 130 46 S205 20 248 74"></path><path id="routeTravel" class="route-travel" d="M12 80 C55 5 88 93 130 46 S205 20 248 74"></path><circle class="route-endpoint" cx="12" cy="80" r="6"></circle><text class="route-label" x="5" y="96">start</text><g id="routeEnd"><circle class="route-endpoint" r="6"></circle><text class="route-label" x="-23" y="18">end</text></g><g id="routeMarker" class="route-marker"><rect x="-8" y="-5" width="16" height="10" rx="3"></rect><circle cx="-5" cy="6" r="2"></circle><circle cx="5" cy="6" r="2"></circle></g></svg></div></div>
+            <div class="io-line"><span class="io-chip">input: <span id="routeInput">8 km</span></span><span class="io-arrow">→</span><span class="io-chip output">output: <span id="routeOutput">$28</span></span></div>
+            <div class="example-equation"><span>fare(d) ≈ 3d + 4</span><strong>inferred rule</strong></div>
+            <label><span>distance travelled</span><input id="routeSlider" type="range" min="1" max="25" step="1" value="8"></label>
+          </article>
+          <article class="example-card unknown">
+            <div class="example-head"><div><span class="type-label">Unknown function</span><h3>Area from a side</h3></div></div>
+            <p class="example-description">The rule is not a straight line: doubling a side makes the square four times larger.</p>
+            <div class="example-visual"><div class="area-visual" id="areaVisual"></div></div>
+            <div class="io-line"><span class="io-chip">input: <span id="areaInput">5 m</span></span><span class="io-arrow">→</span><span class="io-chip output">output: <span id="areaOutput">25 m²</span></span></div>
+            <div class="example-equation"><span>area(s) = s²</span><strong>inferred rule</strong></div>
+            <label><span>side length</span><input id="areaSlider" type="range" min="1" max="10" step="1" value="5"></label>
+          </article>
+          <article class="example-card unknown">
+            <div class="example-head"><div><span class="type-label">Unknown function</span><h3>House estimate</h3></div></div>
+            <p class="example-description">We do not know the exact price rule. A model estimates it from many past house sales.</p>
+            <div class="example-visual"><div class="house-visual"><svg viewBox="0 0 170 105" role="img" aria-label="A simple house with roof, window, and door"><path class="house-roof" d="M18 48 L85 8 L152 48 Z"></path><rect class="house-body" x="30" y="45" width="110" height="50" rx="1"></rect><rect class="house-window" x="45" y="58" width="22" height="19"></rect><path class="house-window" d="M56 58 V77 M45 67 H67"></path><rect class="house-door" x="92" y="63" width="22" height="32" rx="2"></rect><circle cx="109" cy="79" r="2" fill="#f3c969"></circle></svg></div></div>
+            <div class="io-line"><span class="io-chip">input: <span id="houseInput">2 × 100 m²</span></span><span class="io-arrow">→</span><span class="io-chip output">output: <span id="houseOutput">$310k</span></span></div>
+            <div class="example-equation"><span>price(s) ≈ 0.8s + 1.5</span><strong>inferred rule</strong></div>
+            <label><span>living area</span><input id="houseSlider" type="range" min="1" max="5" step="0.1" value="2"></label>
+          </article>
+        </div>
+        <p class="flow-note"><strong>Known or unknown, the shape is the same:</strong> input → rule → output. Machine learning is useful when the rule is too complicated to write down by hand, so we let data help us find it.</p>
+      </div>
+    </section>
+
+    <section id="math">
+      <div class="wrap">
+        <div class="section-heading">
+          <div class="kicker">When the rule is wrong</div>
+          <h2>The model changes its parameters to make smaller mistakes.</h2>
+          <p class="lead">A prediction is only useful when it is close to an example. Loss turns “close” into a number we can minimize.</p>
+        </div>
+        <div class="math-layout">
+          <div class="math-card">
+            <h3>From one example to one update</h3>
+            <p class="small" style="margin-top: 0">For the small model <span class="mono">ŷ = ax + b</span>, compare the prediction with the known answer.</p>
+            <div class="equation">$$e = \hat y - y$$</div>
+            <div class="equation">$$L(a,b) = \frac{1}{n}\sum_{i=1}^{n}(\hat y_i-y_i)^2$$</div>
+            <div class="equation">$$\frac{\partial L}{\partial a}=\frac{2}{n}\sum e_i x_i\qquad\frac{\partial L}{\partial b}=\frac{2}{n}\sum e_i$$</div>
+            <div class="equation">$$a_{new}=a-\eta\frac{\partial L}{\partial a}\qquad b_{new}=b-\eta\frac{\partial L}{\partial b}$$</div>
+            <div class="live-update"><strong>Right now</strong><br><span class="mono">a = <span id="liveA">0</span></span> &nbsp; <span class="mono">b = <span id="liveB">5</span></span><br><span class="mono">∂L/∂a = <span id="liveGradA">-</span></span> &nbsp; <span class="mono">∂L/∂b = <span id="liveGradB">-</span></span></div>
+          </div>
+          <div class="math-card panel-pad">
+            <h3>What the update means</h3>
+            <p class="small">Each parameter has a direction and a step size. The controls below show the model line and its position on the loss landscape at the same time.</p>
+            <p class="hill-copy"><strong>Gradient descent:</strong> move opposite to the gradient, toward lower loss.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="parameters">
+      <div class="wrap">
+        <div class="section-heading">
+          <div class="kicker">Gradient descent</div>
+          <h2>Give the model a starting point, then let it learn.</h2>
+          <p class="lead"><strong>Gradient descent</strong> is the mathematical name for this update. The hidden rule is <span class="mono">y = 3x - 2</span>. Choose a starting line and use the controls to see the equation, derivatives, loss, and hill position change together.</p>
+        </div>
+        <div class="learn-grid">
+          <div class="panel panel-pad">
+            <div class="combined-visual">
+              <div class="landscape"><canvas id="lossPlot" width="650" height="360" aria-label="Interactive loss landscape with gradient and downhill arrows"></canvas><div class="landscape-caption"><span class="gradient-key"><i></i> high loss → low loss</span><span class="mono">● current (a,b)</span></div><div class="landscape-help"><span class="arrow-key"><i></i> gradient points uphill</span><span class="arrow-key down"><i></i> update goes downhill</span><span>click anywhere to choose a starting point</span></div></div>
+              <div class="plot-wrap"><canvas id="learningPlot" width="650" height="410" aria-label="Interactive prediction plot"></canvas></div>
+            </div>
+            <div class="plot-caption"><span class="legend"><i class="legend-dot"></i>examples <i class="legend-line" style="border-color: var(--orange)"></i>current model <i class="legend-dot" style="background: var(--green)"></i>each step at x = 4</span><span class="mono">target: y = 3x − 2</span></div>
+          </div>
+          <div class="panel panel-pad">
+            <h3>Turn the learning crank</h3>
+            <p class="small">The model measures its average error, then uses the direction of that error to update <span class="mono">a</span> and <span class="mono">b</span>.</p>
+            <div class="learn-controls">
+              <div class="parameter"><label><span>starting slope <span class="mono">a</span></span><span class="value mono" id="learnSlopeReadout">0.0</span></label><input id="learnSlope" type="range" min="-2" max="5" step="0.1" value="0"></div>
+              <div class="parameter"><label><span>starting intercept <span class="mono">b</span></span><span class="value mono" id="learnInterceptReadout">5.0</span></label><input id="learnIntercept" type="range" min="-8" max="8" step="0.1" value="5"></div>
+            </div>
+            <div class="step-actions"><div class="jump-steps"><span>Choose</span><input id="stepJump" type="number" min="1" max="100" step="1" value="10" aria-label="Number of gradient descent steps"><span>steps</span></div><button class="step-button" id="runStepsButton">Run <span id="runStepLabel">10</span> steps <span aria-hidden="true">→</span></button></div>
+            <button class="reset-button" id="resetButton" style="width: 100%; margin-top: 8px">Reset</button>
+            <div class="metric"><span>step</span><strong class="mono" id="stepCount">0</strong></div>
+            <div class="metric"><span>mean squared error</span><strong class="mono" id="errorValue">—</strong></div>
+            <div class="metric"><span>current rule</span><strong class="mono" id="learnEquation">y = 0x + 5</strong></div>
+            <div class="step-table-wrap"><table class="step-table"><thead><tr><th>step</th><th>a</th><th>∂L/∂a</th><th>b</th><th>∂L/∂b</th><th>loss</th></tr></thead><tbody id="stepRows"></tbody></table></div>
+          </div>
+        </div>
+        <div class="callout" style="margin-top: 24px"><div class="callout-mark">↳</div><p><strong>That is the seed of a neural network.</strong> A network has many functions composed together, and many learnable weights and biases. Training is the repeated search for parameter values that make its outputs useful.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const learningPlot = $("learningPlot");
+    const lossPlot = $("lossPlot");
+    const temperatureSlider = $("temperatureSlider");
+    const routeSlider = $("routeSlider");
+    const areaSlider = $("areaSlider");
+    const houseSlider = $("houseSlider");
+
+    function cleanNumber(value) {
+      return Number(value).toFixed(1).replace(/\.0$/, "");
+    }
+    function signed(value) {
+      return value < 0 ? `− ${cleanNumber(Math.abs(value))}` : `+ ${cleanNumber(value)}`;
+    }
+    function updateExamples() {
+      const temperature = Number(temperatureSlider.value);
+      const route = Number(routeSlider.value);
+      const side = Number(areaSlider.value);
+      const houseArea = Number(houseSlider.value);
+      $("temperatureInput").textContent = `${temperature} °C`;
+      $("temperatureOutput").textContent = `${cleanNumber(temperature * 9 / 5 + 32)} °F`;
+      $("thermometer").style.setProperty("--heat-height", `${Math.max(8, Math.min(92, (temperature + 20) / 60 * 84))}%`);
+      $("thermometer").style.setProperty("--heat-color", `hsl(${Math.max(8, 205 - (temperature + 20) * 2.8)}, 75%, 53%)`);
+      $("routeInput").textContent = `${route} km`;
+      $("routeOutput").textContent = `$${cleanNumber(route * 3 + 4)}`;
+      const routePath = $("routePath");
+      const routeLength = routePath.getTotalLength();
+      const routeProgress = (route - 1) / 24;
+      const routePoint = routePath.getPointAtLength(routeLength * routeProgress);
+      $("routeTravel").style.strokeDasharray = `${Math.max(1, routeLength * routeProgress)} ${routeLength}`;
+      $("routeMarker").setAttribute("transform", `translate(${routePoint.x} ${routePoint.y})`);
+      $("routeEnd").setAttribute("transform", `translate(${routePoint.x} ${routePoint.y})`);
+      $("areaInput").textContent = `${side} m`;
+      $("areaOutput").textContent = `${side * side} m²`;
+      $("areaVisual").style.setProperty("--area-size", `${25 + side * 6}px`);
+      $("houseInput").textContent = `${cleanNumber(houseArea)} × 100 m²`;
+      $("houseOutput").textContent = `$${cleanNumber((houseArea * .8 + 1.5) * 100)}k`;
+    }
+    function plotFrame(ctx, width, height, xMin, xMax, yMin, yMax) {
+      const pad = { left: 42, right: 16, top: 18, bottom: 34 };
+      const px = (x) => pad.left + (x - xMin) / (xMax - xMin) * (width - pad.left - pad.right);
+      const py = (y) => height - pad.bottom - (y - yMin) / (yMax - yMin) * (height - pad.top - pad.bottom);
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, width, height);
+      ctx.strokeStyle = "#e5e8e2"; ctx.lineWidth = 1;
+      ctx.font = "11px DM Mono, monospace"; ctx.fillStyle = "#8a9690";
+      for (let x = xMin; x <= xMax; x += 2) { ctx.beginPath(); ctx.moveTo(px(x), pad.top); ctx.lineTo(px(x), height - pad.bottom); ctx.stroke(); ctx.fillText(x, px(x) - 5, height - 12); }
+      for (let y = yMin; y <= yMax; y += 5) { ctx.beginPath(); ctx.moveTo(pad.left, py(y)); ctx.lineTo(width - pad.right, py(y)); ctx.stroke(); ctx.fillText(y, 8, py(y) + 4); }
+      ctx.strokeStyle = "#9aa8a0"; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(px(0), pad.top); ctx.lineTo(px(0), height - pad.bottom); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(pad.left, py(0)); ctx.lineTo(width - pad.right, py(0)); ctx.stroke();
+      return { px, py };
+    }
+    const target = [{ x: -4, y: -14 }, { x: -2, y: -8 }, { x: 0, y: -2 }, { x: 2, y: 4 }, { x: 4, y: 10 }];
+    let learnA = 0; let learnB = 5; let steps = 0;
+    let displayedA = learnA; let displayedB = learnB; let animationFrame; let stepHistory = [];
+    function learningState() {
+      const errors = target.map(point => learnA * point.x + learnB - point.y);
+      const mse = errors.reduce((sum, error) => sum + error * error, 0) / errors.length;
+      return { errors, mse };
+    }
+    function drawLearningPlot() {
+      const ctx = learningPlot.getContext("2d");
+      const { px, py } = plotFrame(ctx, learningPlot.width, learningPlot.height, -6, 6, -20, 20);
+      ctx.strokeStyle = "#e86f36"; ctx.lineWidth = 3; ctx.beginPath();
+      for (let x = -6; x <= 6; x += .1) { const y = learnA * x + learnB; x === -6 ? ctx.moveTo(px(x), py(y)) : ctx.lineTo(px(x), py(y)); }
+      ctx.stroke();
+      target.forEach(point => { ctx.fillStyle = "#2878b5"; ctx.beginPath(); ctx.arc(px(point.x), py(point.y), 5, 0, Math.PI * 2); ctx.fill(); });
+      stepHistory.forEach((row, index) => { const trailX = px(4); const trailY = py(row.a * 4 + row.b); ctx.fillStyle = `rgba(63,128,104,${Math.min(.9, .25 + (index + 1) / stepHistory.length * .65)})`; ctx.beginPath(); ctx.arc(trailX, trailY, 4, 0, Math.PI * 2); ctx.fill(); });
+    }
+    function updateLearningUI() {
+      const state = learningState();
+      $("learnSlopeReadout").textContent = cleanNumber(learnA); $("learnInterceptReadout").textContent = cleanNumber(learnB);
+      $("stepCount").textContent = steps; $("errorValue").textContent = state.mse.toFixed(2); $("learnEquation").textContent = `y = ${cleanNumber(learnA)}x ${signed(learnB)}`;
+      const gradients = gradientState();
+      $("liveA").textContent = cleanNumber(learnA); $("liveB").textContent = cleanNumber(learnB);
+      $("liveGradA").textContent = cleanNumber(gradients.a); $("liveGradB").textContent = cleanNumber(gradients.b);
+      drawLearningPlot();
+      animateLossPoint(displayedA, displayedB, learnA, learnB);
+      renderStepRows();
+    }
+    function renderStepRows() {
+      const rows = stepHistory.length ? stepHistory : [{ step: 0, a: learnA, gradA: gradientState().a, b: learnB, gradB: gradientState().b, loss: learningState().mse }];
+      $("stepRows").innerHTML = rows.map(row => `<tr><td>${row.step}</td><td>${cleanNumber(row.a)}</td><td>${cleanNumber(row.gradA)}</td><td>${cleanNumber(row.b)}</td><td>${cleanNumber(row.gradB)}</td><td>${row.loss.toFixed(2)}</td></tr>`).join("");
+    }
+    function gradientState() {
+      return target.reduce((result, point) => { const error = learnA * point.x + learnB - point.y; result.a += error * point.x; result.b += error; return result; }, { a: 0, b: 0 });
+    }
+    function lossAt(a, b) {
+      return target.reduce((sum, point) => { const error = a * point.x + b - point.y; return sum + error * error; }, 0) / target.length;
+    }
+    function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+      const angle = Math.atan2(toY - fromY, toX - fromX);
+      ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(toX, toY); ctx.lineTo(toX - 9 * Math.cos(angle - .45), toY - 9 * Math.sin(angle - .45)); ctx.lineTo(toX - 9 * Math.cos(angle + .45), toY - 9 * Math.sin(angle + .45)); ctx.closePath(); ctx.fill();
+    }
+    function drawLossPlot(ballA = displayedA, ballB = displayedB) {
+      const ctx = lossPlot.getContext("2d"); const width = lossPlot.width; const height = lossPlot.height;
+      const pad = { left: 36, right: 16, top: 18, bottom: 30 }; const aMin = -2; const aMax = 5; const bMin = -8; const bMax = 8;
+      const px = a => pad.left + (a - aMin) / (aMax - aMin) * (width - pad.left - pad.right);
+      const py = b => height - pad.bottom - (b - bMin) / (bMax - bMin) * (height - pad.top - pad.bottom);
+      ctx.clearRect(0, 0, width, height);
+      const columns = 42; const rows = 25; let maxLoss = 1;
+      for (let col = 0; col < columns; col += 1) for (let row = 0; row < rows; row += 1) maxLoss = Math.max(maxLoss, lossAt(aMin + (col / columns) * (aMax - aMin), bMin + (row / rows) * (bMax - bMin)));
+      for (let col = 0; col < columns; col += 1) for (let row = 0; row < rows; row += 1) {
+        const loss = lossAt(aMin + (col / columns) * (aMax - aMin), bMin + (row / rows) * (bMax - bMin));
+        const intensity = Math.min(1, loss / maxLoss); ctx.fillStyle = `rgb(${Math.round(224 - intensity * 140)}, ${Math.round(239 - intensity * 150)}, ${Math.round(249 - intensity * 130)})`;
+        ctx.fillRect(px(aMin + (col / columns) * (aMax - aMin)), py(bMin + ((row + 1) / rows) * (bMax - bMin)), (width - pad.left - pad.right) / columns + 1, (height - pad.top - pad.bottom) / rows + 1);
+      }
+      ctx.save(); ctx.strokeStyle = "rgba(255,255,255,.62)"; ctx.lineWidth = 1;
+      [8, 20, 40, 70, 110].forEach(level => { const radiusA = Math.sqrt(level / 8); const radiusB = Math.sqrt(level); ctx.beginPath(); ctx.ellipse(px(3), py(-2), radiusA * (width - pad.left - pad.right) / (aMax - aMin), radiusB * (height - pad.top - pad.bottom) / (bMax - bMin), 0, 0, Math.PI * 2); ctx.stroke(); });
+      ctx.restore();
+      ctx.strokeStyle = "rgba(23,35,45,.3)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(px(0), pad.top); ctx.lineTo(px(0), height - pad.bottom); ctx.moveTo(pad.left, py(0)); ctx.lineTo(width - pad.right, py(0)); ctx.stroke();
+      ctx.fillStyle = "#17232d"; ctx.font = "11px DM Mono, monospace"; ctx.fillText("a: slope", width - 66, height - 10); ctx.fillText("b: offset", 8, 14);
+      if (stepHistory.length) { ctx.strokeStyle = "rgba(63,128,104,.7)"; ctx.lineWidth = 2; ctx.beginPath(); stepHistory.forEach((row, index) => { const x = px(row.a); const y = py(row.b); index === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); }); ctx.stroke(); stepHistory.forEach((row, index) => { ctx.fillStyle = index === stepHistory.length - 1 ? "#3f8068" : "rgba(63,128,104,.55)"; ctx.beginPath(); ctx.arc(px(row.a), py(row.b), 4, 0, Math.PI * 2); ctx.fill(); }); }
+      const optimumX = px(3); const optimumY = py(-2); ctx.fillStyle = "#3f8068"; ctx.beginPath(); ctx.arc(optimumX, optimumY, 6, 0, Math.PI * 2); ctx.fill(); ctx.fillText("best", optimumX + 9, optimumY - 8);
+      const ballX = px(ballA); const ballY = py(ballB); const gradient = gradientState(); const gradientA = gradient.a * 2 / target.length; const gradientB = gradient.b * 2 / target.length; const magnitude = Math.max(.001, Math.hypot(gradientA, gradientB)); const arrowSize = 48;
+      drawArrow(ctx, ballX, ballY, ballX + gradientA / magnitude * arrowSize, ballY - gradientB / magnitude * arrowSize, "#e86f36");
+      drawArrow(ctx, ballX, ballY, ballX - gradientA / magnitude * arrowSize, ballY + gradientB / magnitude * arrowSize, "#2878b5");
+      ctx.font = "10px DM Mono, monospace"; ctx.fillStyle = "#b94c1d"; ctx.fillText("uphill", ballX + gradientA / magnitude * 30 - 18, ballY - gradientB / magnitude * 30 - 8); ctx.fillStyle = "#2878b5"; ctx.fillText("next step", ballX - gradientA / magnitude * 42 - 18, ballY + gradientB / magnitude * 42 + 16);
+      ctx.fillStyle = "#e86f36"; ctx.beginPath(); ctx.arc(ballX, ballY, 7, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = "white"; ctx.lineWidth = 2; ctx.stroke();
+    }
+    function chooseLossPosition(event) {
+      const rect = lossPlot.getBoundingClientRect(); const scaleX = lossPlot.width / rect.width; const scaleY = lossPlot.height / rect.height;
+      const x = (event.clientX - rect.left) * scaleX; const y = (event.clientY - rect.top) * scaleY; const pad = { left: 36, right: 16, top: 18, bottom: 30 };
+      learnA = -2 + Math.max(0, Math.min(1, (x - pad.left) / (lossPlot.width - pad.left - pad.right))) * 7;
+      learnB = -8 + Math.max(0, Math.min(1, 1 - (y - pad.top) / (lossPlot.height - pad.top - pad.bottom))) * 16;
+      steps = 0; stepHistory = []; displayedA = learnA; displayedB = learnB;
+      $("learnSlope").value = learnA; $("learnIntercept").value = learnB; updateLearningUI();
+    }
+    function animateLossPoint(fromA, fromB, toA, toB) {
+      cancelAnimationFrame(animationFrame); const started = performance.now(); const duration = 280;
+      function frame(now) { const progress = Math.min(1, (now - started) / duration); const eased = 1 - Math.pow(1 - progress, 3); displayedA = fromA + (toA - fromA) * eased; displayedB = fromB + (toB - fromB) * eased; drawLossPlot(); if (progress < 1) animationFrame = requestAnimationFrame(frame); }
+      animationFrame = requestAnimationFrame(frame);
+    }
+    function takeStep() {
+      const learningRate = .018;
+      const gradients = gradientState();
+      displayedA = learnA; displayedB = learnB;
+      learnA -= learningRate * 2 * gradients.a / target.length;
+      learnB -= learningRate * 2 * gradients.b / target.length;
+      steps += 1; const nextState = learningState();
+      stepHistory.push({ step: steps, a: learnA, gradA: gradients.a, b: learnB, gradB: gradients.b, loss: nextState.mse });
+      updateLearningUI();
+    }
+    function resetLearning() {
+      learnA = 0; learnB = 5; steps = 0; stepHistory = [];
+      displayedA = learnA; displayedB = learnB;
+      $("learnSlope").value = learnA; $("learnIntercept").value = learnB;
+      updateLearningUI();
+    }
+    [temperatureSlider, routeSlider, areaSlider, houseSlider].forEach(control => control.addEventListener("input", updateExamples));
+    $("learnSlope").addEventListener("input", event => { learnA = Number(event.target.value); steps = 0; stepHistory = []; updateLearningUI(); });
+    $("learnIntercept").addEventListener("input", event => { learnB = Number(event.target.value); steps = 0; stepHistory = []; updateLearningUI(); });
+    function updateStepLabel() { $("runStepLabel").textContent = Math.max(1, Math.min(100, Number($("stepJump").value) || 1)); }
+    $("stepJump").addEventListener("input", updateStepLabel);
+    $("runStepsButton").addEventListener("click", () => { const count = Math.max(1, Math.min(100, Number($("stepJump").value) || 1)); for (let index = 0; index < count; index += 1) takeStep(); });
+    $("resetButton").addEventListener("click", resetLearning);
+    lossPlot.addEventListener("pointerdown", chooseLossPosition);
+    updateExamples(); updateStepLabel(); updateLearningUI();
+  </script>
+</body>
+</html>
