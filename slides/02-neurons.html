@@ -1,40 +1,1658 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Neural Network Workflow</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{--ink:#17232d;--muted:#65727a;--paper:#f6f5ef;--panel:#fffdf7;--line:#d9ded7;--orange:#e86f36;--blue:#2878b5;--blue-soft:#dcecf7;--green:#3f8068;--green-soft:#e0eee8}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:var(--paper);font:16px/1.55 Manrope,sans-serif}button,input{font:inherit}button{cursor:pointer}canvas{display:block;width:100%;height:auto}.mono{font-family:"DM Mono",monospace}.wrap{width:min(1160px,calc(100% - 36px));margin:auto}.top{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);background:#f6f5efeb;backdrop-filter:blur(12px)}.top div{min-height:48px;display:flex;align-items:center;justify-content:space-between}.top a{color:var(--muted);font-size:12px;font-weight:800;text-decoration:none}.top span{color:var(--blue);font:12px "DM Mono",monospace}.hero,section{padding:64px 0}.eyebrow,.kicker{color:#b94c1d;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}h1,h2,h3,p{margin-top:0}h1{max-width:900px;margin:12px 0 18px;font-size:clamp(42px,7vw,76px);line-height:.98;letter-spacing:-.07em}h1 em{color:var(--orange);font-style:normal}h2{margin-bottom:12px;font-size:clamp(30px,4vw,48px);line-height:1.05;letter-spacing:-.055em}h3{margin-bottom:7px;font-size:19px}.lead{max-width:760px;color:var(--muted);font-size:17px}.heading{margin-bottom:30px}.panel{min-width:0;border:1px solid var(--line);border-radius:8px;background:var(--panel)}.pad{padding:24px}.small{color:var(--muted);font-size:13px}.button{padding:11px 14px;border:1px solid var(--ink);border-radius:7px;color:white;background:var(--ink);font-size:12px;font-weight:800}.button.secondary{color:var(--ink);border-color:#b6d4e8;background:var(--blue-soft)}.formula{padding:14px 16px;border-radius:7px;color:#f7f5ec;background:var(--ink);font:13px/1.7 "DM Mono",monospace}.workflow{display:grid;grid-template-columns:repeat(7,1fr);overflow:hidden;border:1px solid var(--line);border-radius:8px}.step{padding:16px 10px;border:0;border-right:1px solid var(--line);color:var(--muted);background:var(--panel);text-align:left}.step b{display:block;color:var(--blue);font:11px "DM Mono",monospace}.step.active{color:var(--ink);background:var(--blue-soft)}.detail{min-height:96px;margin-top:12px;padding:20px;border-left:4px solid var(--orange);background:#fff0e9}.detail p{margin:0;color:var(--muted);font-size:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.file{display:flex;justify-content:space-between;gap:12px}.badge{padding:7px 9px;border-radius:5px;color:#1f5578;background:var(--blue-soft);font:11px "DM Mono",monospace}.table{overflow:auto;border:1px solid var(--line);border-radius:6px}table{width:100%;min-width:520px;border-collapse:collapse;font:11px "DM Mono",monospace}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:right}th:first-child,td:first-child{text-align:left}th{color:var(--muted);background:#f1f4f0}.control{margin-top:15px;padding:13px;border:1px solid var(--line);border-radius:7px;background:white}.control label{display:flex;justify-content:space-between;margin-bottom:8px;color:var(--muted);font-size:12px}input[type=range]{width:100%;accent-color:var(--orange)}.split{display:flex;height:48px;margin-top:15px;overflow:hidden;border-radius:6px;color:white;font:11px "DM Mono",monospace}.split div{display:grid;place-items:center}.train{background:var(--blue)}.test{background:var(--orange)}.define{display:grid;grid-template-columns:320px 1fr;gap:22px;align-items:start}.builder{position:sticky;top:66px}.builder-block{padding:15px 0;border-bottom:1px solid var(--line)}.builder-block:first-child{padding-top:0}.builder-block:last-child{border:0}.label{display:flex;justify-content:space-between;margin-bottom:9px;font-size:12px;font-weight:800}.layers{display:grid;gap:8px}.layer{padding:9px;border:1px solid var(--line);border-radius:6px;background:white}.segments{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:#edf0eb;border-radius:7px}.segment{padding:8px 3px;border:0;border-radius:5px;color:var(--muted);background:none;font-size:11px;font-weight:800}.segment.active{color:white;background:var(--blue)}.network-head{display:flex;justify-content:space-between;padding:18px;border-bottom:1px solid var(--line)}.network-head p{margin:0;color:var(--muted);font-size:12px}.network-scroll{overflow:auto;background:#fbfcf8}svg{display:block;min-width:700px;width:100%;height:420px}.edge{stroke:#bdc8c2;stroke-width:1;opacity:.42}.edge.signal{stroke:var(--orange);stroke-width:3;opacity:1;stroke-dasharray:7 6;animation:flow 1s linear infinite}.node{stroke-width:2}.input{fill:var(--blue-soft);stroke:var(--blue)}.hidden{fill:#fff0e9;stroke:var(--orange)}.output{fill:var(--green-soft);stroke:var(--green)}.nodeText,.layerText{fill:var(--ink);font:10px "DM Mono",monospace;text-anchor:middle}.layerText{fill:var(--muted);font-weight:500}.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}.stat{padding:14px;border-right:1px solid var(--line)}.stat span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase}.stat strong{font:18px "DM Mono",monospace}.activation{display:grid;grid-template-columns:1fr .75fr;gap:16px;margin-top:16px}.plot{padding:9px;border:1px solid var(--line);border-radius:8px;background:white}.facts{padding:19px}.facts dt{color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase}.facts dd{margin:2px 0 11px;font-size:13px}.loop{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:15px}.loop div{padding:11px 5px;border:1px solid var(--line);border-radius:6px;color:var(--muted);background:white;font-size:11px;font-weight:800;text-align:center}.loop div.active{color:white;background:var(--orange)}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:15px 0}.metric{padding:12px;border:1px solid var(--line);border-radius:6px;background:white}.metric span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase}.metric strong{font:17px "DM Mono",monospace}.actions{display:flex;gap:8px;flex-wrap:wrap}.scores{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.score{padding:15px;border-top:3px solid var(--blue);background:white}.score:nth-child(2){border-color:var(--orange)}.score:nth-child(3){border-color:var(--green)}.score span{display:block;color:var(--muted);font-size:10px}.score strong{font:18px "DM Mono",monospace}.code{min-height:250px;margin:0;padding:17px;overflow:auto;border-radius:7px;color:#f7f5ec;background:var(--ink);font:12px/1.6 "DM Mono",monospace}.status{margin-top:14px;padding:11px;border-left:3px solid var(--green);background:var(--green-soft);font-size:12px}@keyframes flow{to{stroke-dashoffset:-26}}
-@media(max-width:850px){.workflow{grid-template-columns:repeat(2,1fr)}.grid,.define,.activation{grid-template-columns:1fr}.builder{position:static}}@media(max-width:560px){.hero,section{padding:50px 0}.top span{display:none}.workflow,.stats,.scores{grid-template-columns:1fr}.step{border-right:0;border-bottom:1px solid var(--line)}.loop{grid-template-columns:1fr 1fr}.metrics{grid-template-columns:1fr}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ten real houses, three inputs, one price: build a network, then watch every weight and bias at work in the forward pass, the backward pass, and training.">
+  <title>Neurons and Neural Networks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #17232d;
+      --muted: #65727a;
+      --paper: #f6f5ef;
+      --panel: #fffdf7;
+      --line: #d9ded7;
+      --orange: #e86f36;
+      --orange-dark: #b94c1d;
+      --orange-soft: #fff0e9;
+      --blue: #2878b5;
+      --blue-soft: #dcecf7;
+      --green: #3f8068;
+      --green-soft: #e0eee8;
+      --purple: #7b5ea7;
+      --purple-soft: #eee8f6;
+      --yellow: #f3c969;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font: 16px/1.55 Manrope, sans-serif; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    canvas { display: block; width: 100%; height: auto; }
+    .mono { font-family: "DM Mono", monospace; }
+    .blue { color: var(--blue); }
+    .purple { color: var(--purple); }
+    .wrap { width: min(1160px, calc(100% - 32px)); margin: auto; }
+
+    .top { position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--line); background: #f6f5efeb; backdrop-filter: blur(12px); }
+    .top div { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .top a { color: var(--muted); font-size: 12px; font-weight: 800; text-decoration: none; }
+    .top span { color: var(--blue); font: 12px "DM Mono", monospace; }
+
+    .hero, section { padding: 60px 0; }
+    section { border-top: 1px solid var(--line); scroll-margin-top: 48px; }
+    .eyebrow, .kicker { color: var(--orange-dark); font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 900px; margin: 12px 0 18px; font-size: clamp(40px, 7vw, 76px); line-height: .98; letter-spacing: -.07em; }
+    h1 em { color: var(--orange); font-style: normal; }
+    h2 { margin-bottom: 12px; font-size: clamp(28px, 4vw, 46px); line-height: 1.05; letter-spacing: -.055em; }
+    h3 { margin-bottom: 7px; font-size: 19px; letter-spacing: -.03em; }
+    .lead { max-width: 800px; color: var(--muted); font-size: 17px; }
+    .lead b, .small b { color: var(--ink); }
+    .heading { margin-bottom: 28px; }
+    .panel { min-width: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+    .pad { padding: 22px; }
+    .small { color: var(--muted); font-size: 13px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid > *, .builder-grid > *, .activation > *, .walk-grid > *, .train-grid > *, .std-grid > *, .why > * { min-width: 0; }
+    .button { padding: 10px 14px; border: 1px solid var(--ink); border-radius: 7px; color: white; background: var(--ink); font-size: 12px; font-weight: 800; }
+    .button.secondary { color: var(--ink); border-color: #b6d4e8; background: var(--blue-soft); }
+    .button.purple-btn { border-color: var(--purple); background: var(--purple); }
+    .button:disabled { opacity: .45; cursor: default; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .formula { padding: 14px 16px; overflow-x: auto; border-radius: 7px; color: #f7f5ec; background: var(--ink); font: 13px/1.75 "DM Mono", monospace; }
+    .callout { margin-top: 20px; padding: 18px 20px; border-left: 4px solid var(--orange); background: var(--orange-soft); font-size: 14px; }
+    .callout p:last-child { margin-bottom: 0; }
+    .badge-pill { padding: 6px 9px; border-radius: 5px; color: #1f5578; background: var(--blue-soft); font: 11px "DM Mono", monospace; }
+    .plot { padding: 9px; border: 1px solid var(--line); border-radius: 8px; background: white; }
+    .plot-title { margin: 2px 4px 8px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    input[type=range] { width: 100%; accent-color: var(--orange); }
+    .control { padding: 11px 13px; border: 1px solid var(--line); border-radius: 7px; background: white; }
+    .control label { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; color: var(--muted); font-size: 12px; }
+    .control label b { color: var(--ink); font: 500 12px "DM Mono", monospace; }
+    .segments { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; background: #edf0eb; border-radius: 7px; }
+    .segments.two { grid-template-columns: repeat(2, 1fr); }
+    .segment { padding: 7px 4px; border: 0; border-radius: 5px; color: var(--muted); background: none; font-size: 11px; font-weight: 800; }
+    .segment.active { color: white; background: var(--blue); }
+    .house-pick { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+    .house-pick span { margin-right: 4px; color: var(--muted); font-size: 12px; }
+    .house-pick button { min-width: 38px; padding: 5px 7px; border: 1px solid var(--line); border-radius: 5px; color: var(--muted); background: white; font: 11px "DM Mono", monospace; }
+    .house-pick button.active { color: white; border-color: var(--orange); background: var(--orange); }
+
+    .workflow { display: grid; grid-template-columns: repeat(9, 1fr); overflow: hidden; border: 1px solid var(--line); border-radius: 8px; }
+    .step { padding: 14px 10px; border: 0; border-right: 1px solid var(--line); color: var(--muted); background: var(--panel); font-size: 13px; text-align: left; }
+    .step:last-child { border-right: 0; }
+    .step b { display: block; color: var(--blue); font: 11px "DM Mono", monospace; }
+    .step.active { color: var(--ink); background: var(--blue-soft); }
+    .detail { margin-top: 12px; padding: 18px 20px; border-left: 4px solid var(--orange); background: var(--orange-soft); }
+    .detail p { margin: 0; color: var(--muted); font-size: 14px; }
+    .detail a { color: var(--orange-dark); font-size: 13px; font-weight: 800; }
+
+    .table { overflow: auto; border: 1px solid var(--line); border-radius: 6px; background: white; }
+    table { width: 100%; border-collapse: collapse; font: 12px "DM Mono", monospace; }
+    th, td { padding: 8px 9px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--muted); background: #f1f4f0; font-size: 11px; font-weight: 500; }
+    tr:last-child td { border-bottom: 0; }
+    td.z { color: var(--blue); }
+    .pricebar { display: inline-block; height: 8px; margin-right: 8px; border-radius: 4px; background: var(--green); vertical-align: middle; }
+    tfoot td { color: var(--muted); background: #f8f9f6; }
+
+    .morph-bar { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; padding: 14px 16px; }
+    .morph-stops { display: flex; gap: 6px; }
+    .morph-stage { color: var(--orange-dark); font: 500 13px "DM Mono", monospace; text-align: right; min-width: 190px; }
+    .std-legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 10px 0 16px; color: var(--muted); font-size: 13px; }
+    .std-legend b { color: var(--ink); }
+    .std-legend i { display: inline-block; width: 14px; height: 10px; margin-right: 6px; vertical-align: middle; }
+    .std-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .std-card { padding: 16px 16px 14px; }
+    .std-card h3 { display: flex; justify-content: space-between; gap: 10px; font-size: 16px; }
+    .std-card h3 span { color: var(--muted); font: 11px "DM Mono", monospace; letter-spacing: 0; }
+    .std-card svg { display: block; width: 100%; height: auto; margin: 4px 0 8px; }
+    .std-story { font-size: 14px; }
+    .std-story b { color: var(--orange-dark); }
+    .std-math { margin-top: 6px; color: var(--muted); font: 11px "DM Mono", monospace; }
+    .sd-band { fill: rgba(40, 120, 181, .1); }
+    .sd-mean { stroke: var(--green); stroke-width: 2; stroke-dasharray: 4 4; }
+    .sd-axis { stroke: #9aa8a0; }
+    .sd-tick { fill: #8a9690; font: 10px "DM Mono", monospace; text-anchor: middle; }
+    .sd-label { fill: var(--green); font: 10px "DM Mono", monospace; text-anchor: middle; }
+    .sd-dot { fill: var(--blue); stroke: white; stroke-width: 1.5; }
+    .sd-dot.sel { fill: var(--orange); }
+    .why { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 10px; }
+    .why h4 { margin: 0 0 8px; font-size: 13px; }
+    .share { display: grid; grid-template-columns: 50px 1fr 64px; gap: 8px; align-items: center; margin-bottom: 5px; font: 11px "DM Mono", monospace; }
+    .share i { display: block; height: 10px; border-radius: 5px; background: var(--orange); }
+
+    .builder-grid { display: grid; grid-template-columns: 300px 1fr; gap: 22px; align-items: start; }
+    .builder { position: sticky; top: 66px; }
+    .builder-block { padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .builder-block:first-child { padding-top: 0; }
+    .builder-block:last-child { border: 0; }
+    .label { display: flex; justify-content: space-between; margin-bottom: 9px; font-size: 12px; font-weight: 800; }
+    .layers { display: grid; gap: 8px; }
+    .layer { padding: 9px; border: 1px solid var(--line); border-radius: 6px; background: white; }
+    .network-head { display: flex; justify-content: space-between; gap: 10px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+    .network-head p { margin: 0; color: var(--muted); font-size: 12px; }
+    .network-scroll { overflow: auto; background: #fbfcf8; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); }
+    .stat { padding: 14px; border-right: 1px solid var(--line); }
+    .stat:last-child { border-right: 0; }
+    .stat span { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; }
+    .stat strong { font: 18px "DM Mono", monospace; }
+    .activation { display: grid; grid-template-columns: 1fr .75fr; gap: 16px; margin-top: 16px; }
+    .facts { padding: 19px; }
+    .facts dt { color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .facts dd { margin: 2px 0 11px; font-size: 13px; }
+    .net-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    .net-legend i { display: inline-block; width: 18px; height: 4px; margin-right: 6px; border-radius: 2px; vertical-align: middle; }
+
+    .flow { display: block; width: 100%; height: auto; }
+    .w-edge { stroke: var(--orange); stroke-linecap: round; opacity: .6; }
+    .w-edge.neg { stroke: var(--blue); }
+    .w-edge.dead { stroke: #c3cac5; stroke-dasharray: 3 5; opacity: .7; }
+    .w-edge.sel { opacity: 1; stroke: var(--purple); }
+    .hit { stroke: transparent; stroke-width: 12; cursor: pointer; }
+    .w-label, .b-label { fill: var(--ink); font: 500 10px "DM Mono", monospace; text-anchor: middle; paint-order: stroke; stroke: #fbfcf8; stroke-width: 4px; cursor: pointer; }
+    .w-label { text-anchor: end; }
+    .w-label.grad, .b-label.grad { fill: var(--purple); }
+    .w-label.upd, .b-label.upd { fill: var(--green); }
+    .w-label.sel, .b-label.sel { text-decoration: underline; }
+    .layer-title { fill: var(--muted); font: 700 11px Manrope, sans-serif; text-anchor: middle; letter-spacing: .08em; text-transform: uppercase; }
+    .layer-shape { fill: #a5aea9; font: 10px "DM Mono", monospace; text-anchor: middle; }
+    .dots { fill: var(--muted); font: 20px Manrope, sans-serif; text-anchor: middle; }
+    .chip rect { fill: white; stroke: var(--line); }
+    .chip-name { fill: var(--muted); font: 700 10px Manrope, sans-serif; }
+    .chip-raw { fill: var(--ink); font: 12px "DM Mono", monospace; }
+    .chip-z { fill: var(--blue); font: 500 12px "DM Mono", monospace; text-anchor: end; }
+    .nn-in { fill: var(--blue-soft); stroke: var(--blue); stroke-width: 2; }
+    .n-tag { fill: var(--muted); font: 9px "DM Mono", monospace; text-anchor: middle; pointer-events: none; }
+    .n-val { fill: var(--blue); font: 500 12px "DM Mono", monospace; text-anchor: middle; }
+    .hn { cursor: pointer; }
+    .hn circle { fill: var(--orange-soft); stroke: var(--orange); stroke-width: 2; transition: fill .3s, stroke .3s; }
+    .hn.dead circle { fill: #eef0ec; stroke: #b9c0bb; }
+    .hn.zoomed circle { stroke-width: 4; }
+    .n-a { fill: var(--ink); font: 500 11px "DM Mono", monospace; text-anchor: middle; pointer-events: none; }
+    .n-a.back, .n-z.back, .o-z.back { fill: var(--purple); }
+    .hn.dead .n-a { fill: var(--muted); }
+    .n-z { fill: var(--muted); font: 10px "DM Mono", monospace; text-anchor: middle; pointer-events: none; }
+    .onode { cursor: pointer; }
+    .onode rect { fill: var(--green-soft); stroke: var(--green); stroke-width: 2; }
+    .o-z { fill: var(--ink); font: 500 14px "DM Mono", monospace; text-anchor: middle; }
+    .o-d { fill: var(--green); font: 800 15px Manrope, sans-serif; text-anchor: middle; }
+    .o-sub, .o-actual, .o-miss { fill: var(--muted); font: 10px "DM Mono", monospace; text-anchor: middle; }
+    .o-miss { fill: var(--orange-dark); }
+    .pulse.pos { fill: var(--orange); }
+    .pulse.neg { fill: var(--blue); }
+    .pulse.back { fill: var(--purple); }
+    .pulse.zero { fill: #b9c0bb; }
+    .pulse-label { fill: var(--ink); font: 500 10px "DM Mono", monospace; text-anchor: middle; paint-order: stroke; stroke: #fbfcf8; stroke-width: 3px; }
+    .pulse-label.back { fill: var(--purple); }
+
+    .walk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; margin-top: 14px; }
+    .walk-bar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .walk-bar .control { min-width: 260px; padding: 7px 12px; }
+    .walk-side { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .walk-side > *, .zoom > * { min-width: 0; }
+    .phase-dots { display: flex; flex-wrap: wrap; gap: 4px; }
+    .phase-dots span { flex: 1 0 auto; padding: 5px 6px; border-radius: 5px; color: var(--muted); background: #edf0eb; font: 10px "DM Mono", monospace; text-align: center; }
+    .phase-dots span.done { color: var(--ink); background: var(--blue-soft); }
+    .phase-dots span.now { color: white; background: var(--orange); }
+    .phase-dots.back span.now { background: var(--purple); }
+    .caption { min-height: 110px; padding: 15px 17px; border-left: 4px solid var(--orange); background: var(--orange-soft); font-size: 14px; }
+    .caption p { margin: 0 0 6px; }
+    .caption p:last-child { margin-bottom: 0; }
+    .calc { display: block; margin: 3px 0; font: 12px "DM Mono", monospace; overflow-x: auto; white-space: nowrap; }
+    .caption.back { border-color: var(--purple); background: var(--purple-soft); }
+    .zoom { padding: 16px; }
+    .zoom h3 { font-size: 16px; }
+    .zrows { display: grid; gap: 4px; max-width: 440px; margin: 10px 0; }
+    .zr { display: grid; grid-template-columns: 54px 52px 1fr 56px; gap: 6px; align-items: center; font: 12px "DM Mono", monospace; }
+    .zr .arrow { position: relative; color: var(--muted); font-size: 11px; text-align: center; }
+    .zr .arrow::before { content: ""; position: absolute; left: 0; right: 8px; top: 50%; border-top: 1.5px solid #c9d2cd; z-index: 0; }
+    .zr .arrow::after { content: "▶"; position: absolute; right: 0; top: 50%; transform: translateY(-50%); color: #c9d2cd; font-size: 9px; }
+    .zr .arrow b { position: relative; z-index: 1; padding: 0 5px; background: var(--panel); color: var(--ink); font-weight: 500; }
+    .zr .res { text-align: right; }
+    .zsteps { margin: 8px 0 0; padding-left: 18px; font-size: 13px; }
+    .zsteps li { margin-bottom: 5px; }
+    .zsteps .calc { margin-top: 2px; }
+    .zoom canvas { margin-top: 8px; border: 1px solid var(--line); border-radius: 6px; }
+    .matrix-wrap { display: grid; gap: 14px; margin-top: 14px; }
+    .matrix { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font: 12px "DM Mono", monospace; }
+    .mat { display: inline-grid; gap: 2px 10px; padding: 6px 9px; border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); border-radius: 5px; background: white; }
+    .mat span { text-align: right; }
+    .mat-label { display: block; color: var(--muted); font-size: 10px; text-align: center; }
+    .op { color: var(--muted); font-size: 14px; }
+
+    .cg-edge { stroke: #c3cbc6; stroke-width: 1.6; }
+    .cg-edge.lit { stroke: #7d8a83; }
+    .cg-edge.back { stroke: var(--purple); stroke-dasharray: 5 4; }
+    .cg-leaf rect { fill: white; stroke: #b9c3bd; stroke-width: 1.5; }
+    .cg-leaf.data rect { fill: #eef1ec; }
+    .cg-op circle { fill: var(--orange-soft); stroke: var(--orange); stroke-width: 2; }
+    .cg-leaf.now rect, .cg-op.now circle { stroke: var(--ink); stroke-width: 3; }
+    .cg-name { fill: var(--muted); font: 10px "DM Mono", monospace; text-anchor: middle; }
+    .cg-val { fill: var(--ink); font: 500 11px "DM Mono", monospace; text-anchor: middle; }
+    .cg-sym { fill: var(--orange-dark); font: 800 13px Manrope, sans-serif; text-anchor: middle; }
+    .cg-grad { fill: var(--purple); font: 600 11px "DM Mono", monospace; text-anchor: middle; paint-order: stroke; stroke: #fbfcf8; stroke-width: 4px; }
+    .cg-grad.left { text-anchor: end; }
+    .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start; }
+    .rules h3 { grid-column: 1 / -1; margin: 0; font-size: 16px; }
+    .rule { padding: 11px 12px; border: 1px solid var(--line); border-radius: 7px; background: white; font-size: 13px; }
+    .rule b { display: block; color: var(--purple); font: 500 13px "DM Mono", monospace; }
+    .rule.active { border-color: var(--purple); background: var(--purple-soft); }
+
+    .train-bar { display: grid; gap: 14px; padding: 16px; }
+    .train-opts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .train-opts > div > span { display: block; margin-bottom: 5px; color: var(--muted); font-size: 12px; }
+    .loop { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin: 14px 0 10px; }
+    .loop div { padding: 10px 5px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); background: white; font-size: 12px; font-weight: 800; text-align: center; }
+    .loop div.active { color: white; border-color: var(--orange); background: var(--orange); }
+    .loop div.active.back { border-color: var(--purple); background: var(--purple); }
+    .train-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; margin-top: 14px; align-items: start; }
+    .queue td, .queue th { padding: 6px 7px; font-size: 11px; }
+    .queue tr.inbatch td:first-child { box-shadow: inset 3px 0 var(--blue); }
+    .queue tr.idle td { color: #a5aea9; }
+    .queue tr.current td { background: var(--yellow); color: var(--ink); }
+    .tally { margin-top: 10px; padding: 10px; border-radius: 6px; background: #f1f4f0; font: 11px/1.6 "DM Mono", monospace; overflow-x: auto; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px 0; }
+    .metric { padding: 11px; border: 1px solid var(--line); border-radius: 6px; background: white; }
+    .metric span { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; }
+    .metric strong { font: 17px "DM Mono", monospace; }
+    .ptable tr { cursor: pointer; }
+    .ptable tr.sel td { background: #f0ecf7; }
+    .ptable td.flash { animation: flash 1.2s; }
+    .chain { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; margin: 12px 0; font-size: 13px; }
+    .chain > span:nth-child(3n+1) { color: var(--purple); font: 500 12px "DM Mono", monospace; }
+    .chain > span:nth-child(3n) { font: 500 12px "DM Mono", monospace; text-align: right; }
+    .chain > span:nth-child(3n+2) { color: var(--muted); }
+
+    .scores { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin-bottom: 14px; }
+    .score { padding: 14px; border-top: 3px solid var(--blue); background: white; }
+    .score:nth-child(2) { border-color: var(--orange); }
+    .score:nth-child(3) { border-color: var(--green); }
+    .score:nth-child(4) { border-color: #9aa8a0; }
+    .score span { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; }
+    .score strong { font: 18px "DM Mono", monospace; }
+    .score em { display: block; color: var(--muted); font-size: 11px; font-style: normal; }
+    .missbar { display: inline-block; height: 8px; border-radius: 4px; vertical-align: middle; }
+
+    .sliders { display: grid; gap: 9px; margin: 14px 0; }
+    .predict-out { margin: 14px 0; padding: 16px; border-radius: 8px; color: white; background: var(--green); }
+    .predict-out span { display: block; font-size: 12px; opacity: .85; }
+    .predict-out strong { font: 800 30px Manrope, sans-serif; letter-spacing: -.03em; }
+    .predict-out.bad { background: var(--orange-dark); }
+    .psteps { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    .psteps div { padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: white; font-size: 13px; }
+    .toggle { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 13px; font-weight: 700; }
+    .code { max-height: 520px; margin: 0; padding: 17px; overflow: auto; border-radius: 7px; color: #f7f5ec; background: var(--ink); font: 12px/1.6 "DM Mono", monospace; }
+    .status { margin-top: 12px; padding: 10px; border-left: 3px solid var(--green); background: var(--green-soft); font-size: 12px; }
+    .why-list { margin: 12px 0 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
+    .why-list li { margin-bottom: 6px; }
+    .why-list b { color: var(--ink); }
+
+    .popover { position: fixed; z-index: 30; width: 290px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); box-shadow: 0 14px 40px rgba(23, 35, 45, .18); }
+    .popover[hidden] { display: none; }
+    .pop-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .pop-head b { font: 500 13px "DM Mono", monospace; }
+    .pop-head button { border: 0; background: none; color: var(--muted); font-size: 18px; line-height: 1; }
+    .pop-row { display: grid; grid-template-columns: 1fr 76px; gap: 8px; align-items: center; }
+    .pop-row input[type=number] { width: 100%; padding: 5px 6px; border: 1px solid var(--line); border-radius: 5px; font: 12px "DM Mono", monospace; }
+    .popover p { margin: 8px 0 0; }
+
+    @keyframes flash { 0% { background: var(--yellow); } 100% { background: transparent; } }
+    @media (max-width: 950px) {
+      .workflow { grid-template-columns: repeat(3, 1fr); }
+      .step { border-bottom: 1px solid var(--line); }
+      .grid, .builder-grid, .activation, .walk-grid, .train-grid, .std-grid, .why { grid-template-columns: 1fr; }
+      .builder { position: static; }
+      .train-opts { grid-template-columns: 1fr 1fr; }
+      .morph-bar { grid-template-columns: 1fr; }
+      .morph-stage { text-align: left; }
+    }
+    @media (max-width: 560px) {
+      .hero, section { padding: 46px 0; }
+      .workflow { grid-template-columns: 1fr 1fr; }
+      .stats, .metrics, .scores { grid-template-columns: 1fr 1fr; }
+      .train-opts { grid-template-columns: 1fr; }
+      .loop { grid-template-columns: 1fr 1fr; }
+      .top span { display: none; }
+    }
+  </style>
 </head>
 <body>
 <header class="top"><div class="wrap"><a href="../index.html">← all chapters</a><span>02 / NEURAL NETWORK WORKFLOW</span></div></header>
 <main>
-<section class="hero"><div class="wrap"><div class="eyebrow">Neural networks / chapter 02</div><h1>Build it. Train it. <em>Prove it works.</em></h1><p class="lead">Follow the full regression workflow, then change depth, width, and activation to see exactly how a neural network is defined.</p></div></section>
-<section><div class="wrap"><div class="heading"><div class="kicker">Complete workflow</div><h2>Seven stages, one repeatable process.</h2></div><div class="workflow" id="steps"></div><div class="detail" id="detail"></div></div></section>
-<section><div class="wrap"><div class="heading"><div class="kicker">01 / Load data</div><h2>The network only sees numbers.</h2><p class="lead">Features become matrix <span class="mono">X</span>; prices become target <span class="mono">y</span>. Split first, then calculate preprocessing from training data only.</p></div><div class="grid"><div class="panel pad"><div class="file"><div><h3>King County sales</h3><p class="small">21,613 rows · 18 features · 1 target</p></div><span class="badge">kc_house_data.csv</span></div><div class="table"><table><tr><th>row</th><th>bedrooms</th><th>sqft</th><th>grade</th><th>price</th></tr><tr><td>0</td><td>3</td><td>1,180</td><td>7</td><td>$221,900</td></tr><tr><td>1</td><td>3</td><td>2,570</td><td>7</td><td>$538,000</td></tr><tr><td>2</td><td>2</td><td>770</td><td>6</td><td>$180,000</td></tr></table></div><div class="control"><label><span>training fraction</span><b id="splitValue">80%</b></label><input id="split" type="range" min="60" max="90" step="5" value="80"></div><div class="split"><div class="train" id="train"></div><div class="test" id="test"></div></div></div><div class="panel pad"><h3>Standardize features</h3><p class="small">Square footage and waterfront use different scales. Standardization makes their magnitudes comparable.</p><div class="formula">x′ = (x − mean_train) / std_train<br><br>target = standardize(log(price))</div><p class="small" style="margin-top:15px"><b>No leakage:</b> save the training mean and standard deviation; reuse them for test rows and future houses.</p></div></div></div></section>
-<section><div class="wrap"><div class="heading"><div class="kicker">02 / Define network</div><h2>Depth, nodes, and activation control the model.</h2><p class="lead">Change the architecture. Tensor shapes and trainable parameter counts update with the diagram.</p></div><div class="define"><aside class="panel pad builder"><div class="builder-block"><div class="label"><span>Hidden depth</span><b id="depthValue">2 layers</b></div><input id="depth" type="range" min="1" max="4" value="2"></div><div class="builder-block"><div class="label"><span>Nodes per layer</span><span>width</span></div><div class="layers" id="layers"></div></div><div class="builder-block"><div class="label"><span>Hidden activation</span></div><div class="segments" id="segments"><button class="segment active" data-a="relu">ReLU</button><button class="segment" data-a="tanh">tanh</button><button class="segment" data-a="sigmoid">sigmoid</button></div></div><div class="builder-block"><div class="label"><span>Output</span><b>1 linear node</b></div><p class="small">Regression needs an unrestricted number, so the price output uses no hidden activation.</p></div><button class="button" id="forward">Animate forward pass →</button></aside><div><div class="panel"><div class="network-head"><div><h3 id="arch"></h3><p>Each connection has a learned weight.</p></div><span class="badge">HousePriceRegressor</span></div><div class="network-scroll"><svg id="net" viewBox="0 0 900 420"></svg></div><div class="stats"><div class="stat"><span>depth</span><strong id="depthStat"></strong></div><div class="stat"><span>hidden nodes</span><strong id="nodeStat"></strong></div><div class="stat"><span>parameters</span><strong id="paramStat"></strong></div><div class="stat"><span>output shape</span><strong>[batch,1]</strong></div></div></div><div class="activation"><div class="plot"><canvas id="activation" width="680" height="320"></canvas></div><div class="panel facts"><div class="kicker">Activation</div><h3 id="actTitle"></h3><p class="small" id="actText"></p><dl><dt>Range</dt><dd id="actRange"></dd><dt>Why use it?</dt><dd id="actUse"></dd><dt>Risk</dt><dd id="actRisk"></dd></dl></div></div></div></div></div></section>
-<section><div class="wrap"><div class="heading"><div class="kicker">03 / Train</div><h2>A batch repeats four operations.</h2><p class="lead">Forward pass → MSE loss → backpropagation → Adam update. One epoch processes every training row once.</p></div><div class="grid"><div class="panel pad"><div class="loop" id="loop"><div class="active">1 · forward</div><div>2 · loss</div><div>3 · backward</div><div>4 · update</div></div><div class="plot"><canvas id="loss" width="700" height="390"></canvas></div></div><div class="panel pad"><h3>Training state</h3><div class="metrics"><div class="metric"><span>epoch</span><strong id="epoch">0 / 100</strong></div><div class="metric"><span>batch</span><strong id="batch">0 / 68</strong></div><div class="metric"><span>train MSE</span><strong id="trainLoss">1.000</strong></div><div class="metric"><span>validation MSE</span><strong id="valLoss">1.020</strong></div></div><div class="actions"><button class="button" id="epochs">Train 10 epochs</button><button class="button secondary" id="oneBatch">One batch</button><button class="button secondary" id="reset">Reset</button></div><div class="formula" style="margin-top:15px">loss = mean((prediction − price)²)<br>weight ← weight − rate × gradient</div><p class="small" style="margin-top:13px">Backpropagation uses the chain rule to find every parameter’s contribution to the error. Adam uses those gradients to change the weights.</p></div></div></div></section>
-<section><div class="wrap"><div class="heading"><div class="kicker">04–05 / Test and evaluate</div><h2>Freeze the model, then measure generalization.</h2><p class="lead">The test set never updates weights. MAE reports a typical miss, RMSE emphasizes large misses, and R² measures explained variation.</p></div><div class="grid"><div class="panel pad"><div class="scores"><div class="score"><span>MAE</span><strong id="mae"></strong></div><div class="score"><span>RMSE</span><strong id="rmse"></strong></div><div class="score"><span>R²</span><strong id="r2"></strong></div></div><div class="formula" style="margin-top:15px">MAE = mean(|actual − predicted|)<br>RMSE = √mean((actual − predicted)²)</div></div><div class="plot"><canvas id="evaluation" width="680" height="400"></canvas></div></div></div></section>
-<section><div class="wrap"><div class="heading"><div class="kicker">06–07 / Save and load</div><h2>A checkpoint is more than weights.</h2><p class="lead">Preserve architecture, feature order, preprocessing statistics, and learned state. Loading recreates the same network and calls evaluation mode.</p></div><div class="grid"><div class="panel pad"><h3>Browser checkpoint</h3><p class="small">Save the current architecture and epoch, change them, then load to restore.</p><div class="actions"><button class="button" id="save">Save</button><button class="button secondary" id="load">Load</button></div><div class="status" id="status">No checkpoint saved yet.</div><p class="small" style="margin-top:15px"><b>PyTorch:</b> save <span class="mono">state_dict</span>, rebuild the identical class, load weights, call <span class="mono">model.eval()</span>, and apply saved preprocessing.</p></div><pre class="code" id="code"></pre></div></div></section>
+  <section class="hero" style="border-top: 0">
+    <div class="wrap">
+      <div class="eyebrow">Neural networks / chapter 02</div>
+      <h1>Three numbers in. <em>One price out.</em></h1>
+      <p class="lead">Ten real houses from the King County dataset, three inputs (bedrooms, bathrooms, living area) and one output (price). You build the network, and every weight and bias stays visible on its arrow. Then you watch a house travel forward to a price, watch the blame for the error travel backward, and watch training repeat both until the predictions fit.</p>
+      <div class="workflow" id="steps"></div>
+      <div class="detail" id="detail"></div>
+    </div>
+  </section>
+
+  <section id="data">
+    <div class="wrap">
+      <div class="heading"><div class="kicker">01 / The data</div><h2>Ten houses, three inputs, one answer.</h2><p class="lead">Each row is one example. The first three columns are what the network gets to <b>see</b> (the inputs, <span class="mono">x</span>). The price is what it must <b>predict</b> (the target, <span class="mono">y</span>).</p></div>
+      <div class="table"><table><thead><tr><th>house</th><th>bedrooms</th><th>bathrooms</th><th>sqft_living</th><th>price</th></tr></thead><tbody id="houseTable"></tbody></table></div>
+      <p class="small" style="margin-top: 12px">Real rows from <span class="mono">kc_house_data.csv</span>. Ten rows are enough to build intuition. Full training on all 21,613 rows belongs in Python.</p>
+    </div>
+  </section>
+
+  <section id="standardize">
+    <div class="wrap">
+      <div class="heading"><div class="kicker">02 / Standardization</div><h2>Put every column on the same ruler.</h2>
+        <p class="lead">A network sees only bare numbers. It has no idea that 3 bedrooms is a lot, while 3 sqft would be tiny. Left alone, living area (thousands) would drown out bedrooms (single digits) just because its numbers are bigger.</p>
+        <p class="lead">So we translate every column into the same everyday question: <b>how ordinary or unusual is this house?</b> On the new scale, <b>0</b> means average, <b>+1</b> clearly above average, <b>−1</b> clearly below, and <b>±2</b> rare. Two moves get us there: <b>① − mean</b> (subtract the column's average: slides everything so the average house sits at 0), then <b>② ÷ std</b> (divide by the standard deviation: shrinks or stretches so a typical gap from the average counts as 1). Press play to watch.</p>
+      </div>
+      <div class="panel morph-bar">
+        <div class="morph-stops"><button class="button secondary" data-morph="0">raw</button><button class="button secondary" data-morph="1">− mean (slide)</button><button class="button secondary" data-morph="2">÷ std (rescale)</button><button class="button" id="morphPlay">Play ▶</button></div>
+        <input id="morph" type="range" min="0" max="2" step="0.01" value="0" aria-label="Standardization stage">
+        <div class="morph-stage" id="morphStage"></div>
+      </div>
+      <div class="std-legend">
+        <span><i style="border-top: 2px dashed var(--green)"></i><b>mean</b> = the average house</span>
+        <span><i style="background: rgba(40, 120, 181, .18)"></i><b>std</b> (standard deviation) = the typical distance of a house from the average</span>
+        <span class="house-pick" data-pick></span>
+      </div>
+      <div class="std-grid" id="stdGrid"></div>
+      <div class="grid" style="margin-top: 20px">
+        <div>
+          <h3>Before and after, side by side</h3>
+          <p class="small">Blue columns are the standardized values. Every blue column now has an average of 0 and a typical gap of 1.</p>
+          <div class="table"><table id="stdTable"></table></div>
+        </div>
+        <div class="panel pad">
+          <h3>Why bother?</h3>
+          <p class="small">Give each input the same weight (0.5) and add them up, the way a neuron does. With raw numbers, living area takes almost the whole total just because its numbers are big. After standardizing, each input counts according to how unusual the house is.</p>
+          <div class="why" id="why"></div>
+          <p class="small" style="margin-top: 14px"><b>Keep the numbers.</b> The averages and typical gaps are saved with the model, and every future house is translated with these <i>same</i> numbers (section 09).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="build">
+    <div class="wrap">
+      <div class="heading"><div class="kicker">03 / Build your network</div><h2>Depth, nodes, and activation control the model.</h2><p class="lead">This is the actual network used by every section below. Each arrow carries a <b>weight</b> (the number written on it) and each neuron has a <b>bias</b> (the <span class="mono">b</span> under it). They start as random numbers; training will tune them. Click any weight or bias to change it.</p></div>
+      <div class="builder-grid">
+        <aside class="panel pad builder">
+          <div class="builder-block"><div class="label"><span>Hidden depth</span><b id="depthValue"></b></div><input id="depth" type="range" min="1" max="4" value="2"></div>
+          <div class="builder-block"><div class="label"><span>Nodes per layer</span><span>width</span></div><div class="layers" id="layers"></div></div>
+          <div class="builder-block"><div class="label"><span>Hidden activation</span></div><div class="segments" id="segments"><button class="segment" data-a="relu">ReLU</button><button class="segment" data-a="tanh">tanh</button><button class="segment" data-a="sigmoid">sigmoid</button></div></div>
+          <div class="builder-block"><div class="label"><span>Output</span><b>1 linear node</b></div><p class="small">Regression needs an unrestricted number, so the price output uses no activation.</p></div>
+          <div class="actions"><button class="button" id="forward">Animate forward pass →</button><button class="button secondary" id="randomize">Randomize weights</button></div>
+        </aside>
+        <div>
+          <div class="panel">
+            <div class="network-head"><div><h3 id="arch"></h3><p id="labelNote"></p></div><span class="badge-pill">HousePriceRegressor</span></div>
+            <div class="network-scroll"><svg id="net" class="flow"></svg></div>
+            <div class="net-legend"><span><i style="background: var(--orange)"></i>positive weight</span><span><i style="background: var(--blue)"></i>negative weight</span><span>thicker = larger weight</span><span class="mono">b = bias</span></div>
+            <div class="stats"><div class="stat"><span>depth</span><strong id="depthStat"></strong></div><div class="stat"><span>hidden nodes</span><strong id="nodeStat"></strong></div><div class="stat"><span>parameters</span><strong id="paramStat"></strong></div><div class="stat"><span>output shape</span><strong>[batch,1]</strong></div></div>
+          </div>
+          <div class="activation">
+            <div class="plot"><canvas id="activation" width="680" height="320"></canvas></div>
+            <div class="panel facts"><div class="kicker">Activation</div><h3 id="actTitle"></h3><p class="small" id="actText"></p><dl><dt>Range</dt><dd id="actRange"></dd><dt>Why use it?</dt><dd id="actUse"></dd><dt>Risk</dt><dd id="actRisk"></dd></dl></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="forward-pass">
+    <div class="wrap">
+      <div class="heading"><div class="kicker">04 / Forward pass</div><h2>From the input layer to a price, one step at a time.</h2><p class="lead">Pick a house and press <b>Next step</b>. Its three numbers enter on the left. At every neuron they are multiplied by the weights on the arrows, added up with the bias, and passed through the activation, layer by layer, until a price comes out. The zoom panel shows the arithmetic inside the neuron being computed. Click any neuron to zoom into it.</p></div>
+      <div class="walk-bar"><div class="house-pick" data-pick></div><div class="actions"><button class="button" id="fwdNext">Next step ▸</button><button class="button secondary" id="fwdPlay">Play all</button><button class="button secondary" id="fwdReset">Reset</button></div></div>
+      <div class="panel">
+        <div class="network-scroll"><svg id="fwdNet" class="flow"></svg></div>
+        <div class="net-legend"><span><b class="mono" style="color: var(--ink)">2,570</b> raw value</span><span><b class="mono blue">→ +0.75</b> the same value standardized (section 02); only this blue number enters the network</span><span>number on an arrow = its weight · b = bias</span><span>grey neuron = switched off by ReLU (output 0)</span></div>
+      </div>
+      <div class="phase-dots" id="fwdDots" style="margin-top: 12px"></div>
+      <div class="walk-grid">
+        <div class="caption" id="fwdCaption"></div>
+        <div class="panel zoom" id="fwdZoom"></div>
+      </div>
+      <div class="panel pad" style="margin-top: 20px">
+        <h3>The same calculation as matrices</h3>
+        <p class="small">Libraries like PyTorch compute a whole layer at once. Row <i>j</i> of each weight matrix holds the weights on the arrows into neuron <i>j</i>.</p>
+        <div class="matrix-wrap" id="matrix"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="graph">
+    <div class="wrap">
+      <div class="heading"><div class="kicker">05 / Computation graph</div><h2>Break the calculation into tiny steps.</h2>
+        <p class="lead">A neural network is one long calculation made of a few kinds of tiny operations: multiply, add, activate, subtract, square. Drawn as boxes and arrows, that calculation is a <b>computation graph</b>. Below is the path from one neuron of your last hidden layer all the way to the loss, with real numbers for the chosen house. Everything else in the network is lumped into <span class="mono">rest</span>.</p>
+        <p class="lead"><b>Forward</b>, values flow left → right. <b>Backward</b>, each operation needs only one simple <b>local rule</b> to pass the blame from its output to its inputs. Chaining those rules right → left gives every gradient. That is all backpropagation is.</p>
+      </div>
+      <div class="walk-bar"><div class="house-pick" data-pick></div><div class="house-pick" id="cgPick"></div><div class="actions"><button class="button" id="cgNext">Next step ▸</button><button class="button secondary" id="cgPlay">Play all</button><button class="button secondary" id="cgReset">Reset</button></div></div>
+      <div class="panel">
+        <div class="network-scroll"><svg id="cgSvg" class="flow" style="min-width: 860px"></svg></div>
+        <div class="net-legend"><span>boxes = numbers we start with (leaves)</span><span>circles = operations</span><span class="mono">black = value (forward)</span><span class="mono purple">∂ = blame: how much the loss changes if this value goes up a tiny bit</span></div>
+      </div>
+      <div class="phase-dots" id="cgDots" style="margin-top: 12px"></div>
+      <div class="walk-grid">
+        <div class="caption" id="cgCaption"></div>
+        <div class="rules" id="cgRules"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="backward">
+    <div class="wrap">
+      <div class="heading"><div class="kicker">06 / Backward pass</div><h2>Follow the blame backwards, one layer at a time.</h2>
+        <p class="lead">The forward pass gave a price that is off. The backward pass answers one question for <b>every</b> weight and bias: <b>if I nudged this number up a little, would the error get bigger or smaller, and by how much?</b> That answer is the <b>gradient</b> (<span class="mono purple">g</span>).</p>
+        <p class="lead">It starts at the output with the size and direction of the miss (called <span class="mono purple">δ</span>, "delta", the blame). Then it walks back through the arrows. Each arrow's gradient = <span class="mono purple">δ</span> of the neuron it points to × the value that travelled along it. Finally, every number takes a small step against its gradient. It is the computation graph's local rules (section 05), applied to every neuron at once.</p>
+      </div>
+      <div class="walk-bar"><div class="house-pick" data-pick></div><div class="actions"><button class="button purple-btn" id="bwdNext">Next step ▸</button><button class="button secondary" id="bwdPlay">Play all</button><button class="button secondary" id="bwdReset">Reset</button><button class="button" id="bwdApply" disabled>Apply update</button><button class="button secondary" id="bwdRandom">Randomize weights</button></div><div class="control"><label><span>learning rate η (step size)</span><b class="lr-val"></b></label><input class="lr-input" type="range" min="0.01" max="0.6" step="0.01"></div></div>
+      <div class="panel">
+        <div class="network-scroll"><svg id="bwdNet" class="flow"></svg></div>
+        <div class="net-legend"><span><b class="mono">w</b> weight · <b class="mono purple">g</b> gradient</span><span class="purple">purple = blame flowing back</span><span class="mono" style="color: var(--green)">old→new</span><span>click any arrow or bias to edit it and see its gradient</span></div>
+      </div>
+      <div class="phase-dots back" id="bwdDots" style="margin-top: 12px"></div>
+      <div class="walk-grid">
+        <div class="caption back" id="bwdCaption"></div>
+        <div class="panel zoom" id="bwdZoom"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="learn">
+    <div class="wrap">
+      <div class="heading"><div class="kicker">07 / Training</div><h2>Forward, loss, backward, update. Repeat.</h2><p class="lead">Training is just sections 04 and 06 on repeat, for many houses. One <b>iteration</b> has four parts. <b>Forward:</b> each house in the batch flows through. <b>Loss:</b> the misses are squared and averaged. <b>Backward:</b> blame flows back, summed over the batch. <b>Update:</b> every weight and bias steps against its gradient. Use <b>Step</b> to go one phase at a time, <b>Play</b> to watch, or fast-forward.</p></div>
+      <div class="panel train-bar">
+        <div class="actions"><button class="button" id="trStep">Step ▸</button><button class="button secondary" id="trPlay">Play ▶</button><button class="button secondary" id="trFinish">Finish iteration</button><button class="button secondary" id="trFF10">+10 iterations ⏩</button><button class="button secondary" id="trFF100">+100 ⏩</button><button class="button secondary" id="trReset">Reset weights</button></div>
+        <div class="train-opts">
+          <div><span>batch size (houses per update)</span><div class="segments two" id="batchSeg"><button class="segment" data-b="1">1 house</button><button class="segment" data-b="10">all 10</button></div></div>
+          <div><span>hidden activation (set in section 03)</span><div class="badge-pill" id="trAct" style="display: inline-block"></div></div>
+          <div class="control"><label><span>learning rate η</span><b class="lr-val"></b></label><input class="lr-input" type="range" min="0.01" max="0.6" step="0.01"></div>
+          <div class="control"><label><span>animation speed</span><b id="speedVal"></b></label><input id="speed" type="range" min="0.25" max="4" step="0.25" value="1"></div>
+        </div>
+      </div>
+      <div class="loop" id="trLoop"><div>1 · forward</div><div>2 · loss</div><div>3 · backward</div><div>4 · update</div></div>
+      <div class="caption" id="trCaption"></div>
+      <div class="train-grid">
+        <div class="panel"><div class="network-scroll"><svg id="trNet" class="flow"></svg></div><p class="small" style="margin: 0; padding: 10px 14px">Click any arrow or bias to inspect its gradient below.</p></div>
+        <div class="panel pad">
+          <h3>The 10 rows</h3>
+          <p class="small" id="queueNote"></p>
+          <div class="table"><table class="queue" id="queue"></table></div>
+          <div class="tally" id="tally"></div>
+        </div>
+      </div>
+      <div class="metrics"><div class="metric"><span>iterations (updates)</span><strong id="mIter"></strong></div><div class="metric"><span>epochs (passes over all 10)</span><strong id="mEpoch"></strong></div><div class="metric"><span>loss (MSE, z-units)</span><strong id="mLoss"></strong></div><div class="metric"><span>typical miss (RMSE)</span><strong id="mRmse"></strong></div></div>
+      <div class="grid">
+        <div class="plot"><div class="plot-title">Actual (●) vs predicted (○) price for each house</div><canvas id="dumbbell" width="700" height="330"></canvas></div>
+        <div class="plot"><div class="plot-title">Loss after every update (all 10 houses)</div><canvas id="lossCurve" width="700" height="330"></canvas></div>
+      </div>
+      <div class="grid" style="margin-top: 20px">
+        <div>
+          <h3>Parameters, last update</h3>
+          <p class="small" id="ptableNote"></p>
+          <div class="table" style="max-height: 520px"><table class="ptable" id="ptable"></table></div>
+        </div>
+        <div class="panel pad" id="inspector"></div>
+      </div>
+      <p class="small" style="margin-top: 16px"><b>Batch size 1</b> updates after every single house: fast but jumpy. <b>All 10</b> averages the blame over every house first: one calm step per epoch. Real training uses batches of 32–256 rows, shuffled every epoch. Your Python script uses <b>Adam</b>, a smarter version of the same <span class="mono">old − η × gradient</span> rule that adapts the step size for each parameter.</p>
+    </div>
+  </section>
+
+  <section id="check">
+    <div class="wrap">
+      <div class="heading"><div class="kicker">08 / Check the fit</div><h2>How far off is it, in dollars?</h2><p class="lead">These scores update as the network trains. They compare its predictions with the actual prices of the 10 houses. To make them meaningful, compare with a lazy baseline that guesses the average price for every house.</p></div>
+      <div class="scores">
+        <div class="score"><span>MAE</span><strong id="sMae"></strong><em>typical miss</em></div>
+        <div class="score"><span>RMSE</span><strong id="sRmse"></strong><em>punishes big misses</em></div>
+        <div class="score"><span>R²</span><strong id="sR2"></strong><em>1 = perfect, 0 = baseline</em></div>
+        <div class="score"><span>baseline MAE</span><strong id="sBase"></strong><em>always guess the mean</em></div>
+      </div>
+      <div class="table"><table id="checkTable"></table></div>
+      <div class="callout"><p><b>Honest caveat:</b> the network learned from these same 10 houses, so this measures <i>fit</i>, not <i>generalization</i>. A model can memorize its training rows and still fail on new houses. That is why your Python script holds out a test set that never touches the weights.</p></div>
+    </div>
+  </section>
+
+  <section id="use">
+    <div class="wrap">
+      <div class="heading"><div class="kicker">09 / Using the trained model</div><h2>A trained model is its numbers plus a recipe.</h2><p class="lead">To price a new house you need the learned weights and biases <i>and</i> everything that turns a house into network inputs: the feature order, the averages and typical gaps, the architecture and the activation. Try a house that is not in the table.</p></div>
+      <div class="grid">
+        <div class="panel pad">
+          <h3>Price a new house</h3>
+          <div class="sliders">
+            <div class="control"><label><span>bedrooms</span><b id="uBedVal"></b></label><input id="uBed" type="range" min="1" max="6" step="1" value="3"></div>
+            <div class="control"><label><span>bathrooms</span><b id="uBathVal"></b></label><input id="uBath" type="range" min="0.75" max="4" step="0.25" value="2"></div>
+            <div class="control"><label><span>living area (sqft)</span><b id="uSqftVal"></b></label><input id="uSqft" type="range" min="500" max="4500" step="10" value="2000"></div>
+          </div>
+          <div class="psteps" id="uSteps"></div>
+          <div class="predict-out" id="uOut"></div>
+          <label class="toggle"><input type="checkbox" id="uForgot"> Forget to standardize (feed raw numbers)</label>
+        </div>
+        <div>
+          <pre class="code" id="ckpt"></pre>
+          <div class="actions" style="margin-top: 10px"><button class="button" id="save">Save checkpoint</button><button class="button secondary" id="load">Load checkpoint</button></div>
+          <div class="status" id="status">No checkpoint saved yet. Train a little, save, reset, then load.</div>
+          <ul class="why-list">
+            <li><b>parameters</b>: the weights and biases that training found.</li>
+            <li><b>architecture + activation</b>: the function those numbers plug into.</li>
+            <li><b>feature_order</b>: the first column of W1 multiplies the first feature. Swap bedrooms and sqft, and sqft's weights would be applied to bedrooms.</li>
+            <li><b>preprocessing</b>: the network only understands standardized inputs and outputs. Tick "forget to standardize" to see what happens without it.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
+
+<div class="popover" id="pop" hidden>
+  <div class="pop-head"><b id="popTitle"></b><button id="popClose" aria-label="Close">×</button></div>
+  <div class="pop-row"><input id="popRange" type="range" min="-3" max="3" step="0.01"><input id="popNum" type="number" min="-3" max="3" step="0.01"></div>
+  <p class="small" id="popInfo"></p>
+</div>
+
 <script>
-const $=id=>document.getElementById(id),S={split:80,depth:2,widths:[64,32,16,8],a:'relu',epoch:0,batch:0,loop:0};
-const flow=[['Load data','Read the CSV, select numeric features, split train/test, and standardize without leakage.'],['Define network','Choose input size, depth, width, activations, and a linear regression output.'],['Train','Repeat forward pass, MSE, backpropagation, and Adam updates across batches.'],['Test','Freeze weights and predict held-out houses that never influenced training.'],['Evaluate','Use MAE, RMSE, R², and plots to understand generalization.'],['Save','Store weights together with architecture and preprocessing metadata.'],['Load','Rebuild the same model, restore weights, use eval mode, and transform new inputs identically.']];
-$('steps').innerHTML=flow.map((x,i)=>`<button class="step ${i?'':'active'}" data-i="${i}"><b>0${i+1}</b>${x[0]}</button>`).join('');function detail(i){document.querySelectorAll('.step').forEach((x,j)=>x.classList.toggle('active',i===j));$('detail').innerHTML=`<h3>${flow[i][0]}</h3><p>${flow[i][1]}</p>`}document.querySelectorAll('.step').forEach(x=>x.onclick=()=>detail(+x.dataset.i));detail(0);
-function split(){S.split=+$('split').value;let tr=Math.round(21613*S.split/100),te=21613-tr;$('splitValue').textContent=S.split+'%';$('train').style.width=S.split+'%';$('test').style.width=100-S.split+'%';$('train').textContent='train · '+tr.toLocaleString();$('test').textContent='test · '+te.toLocaleString()}$('split').oninput=split;split();
-const A={relu:{title:'ReLU: max(0,z)',text:'Negative signals become zero; positive signals pass unchanged.',range:'[0, ∞)',use:'Fast and effective in hidden layers.',risk:'Nodes can become permanently inactive.',f:x=>Math.max(0,x)},tanh:{title:'tanh(z)',text:'Smoothly compresses signals around zero.',range:'(−1, 1)',use:'Bounded, zero-centered activations.',risk:'Large inputs saturate and gradients shrink.',f:x=>Math.tanh(x)},sigmoid:{title:'sigmoid(z)',text:'Compresses signals into a probability-like range.',range:'(0, 1)',use:'Binary classification outputs.',risk:'Saturates and is not zero-centered.',f:x=>1/(1+Math.exp(-x))}};
-function controls(){$('layers').innerHTML=S.widths.slice(0,S.depth).map((w,i)=>`<div class="layer"><div class="label"><span>hidden ${i+1}</span><b id="wv${i}">${w} nodes</b></div><input data-i="${i}" type="range" min="4" max="96" step="4" value="${w}"></div>`).join('');$('layers').querySelectorAll('input').forEach(x=>x.oninput=e=>{let i=+e.target.dataset.i;S.widths[i]=+e.target.value;$('wv'+i).textContent=S.widths[i]+' nodes';network()})}
-function params(){let z=[18,...S.widths.slice(0,S.depth),1];return z.slice(1).reduce((t,n,i)=>t+z[i]*n+n,0)}function positions(n,x){let m=Math.min(n,9);return Array.from({length:m},(_,i)=>({x,y:m===1?210:65+i*290/(m-1),label:n>m&&i===4?'⋮':''}))}
-function network(){let sizes=[18,...S.widths.slice(0,S.depth),1],gap=900/(sizes.length+1),ls=sizes.map((n,i)=>positions(n,gap*(i+1))),edges='',nodes='';ls.slice(0,-1).forEach((l,i)=>l.forEach(a=>ls[i+1].forEach(b=>edges+=`<line class="edge" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`)));ls.forEach((l,i)=>{let type=i?i===ls.length-1?'output':'hidden':'input';l.forEach((n,j)=>nodes+=`<circle class="node ${type}" cx="${n.x}" cy="${n.y}" r="${type==='output'?22:15}"/><text class="nodeText" x="${n.x}" y="${n.y+4}">${n.label||(type==='input'?'x'+(j+1):type==='output'?'ŷ':'a'+(j+1))}</text>`);nodes+=`<text class="layerText" x="${gap*(i+1)}" y="28">${i?sizes.length-1===i?'price':'hidden '+i:'18 features'}</text><text class="layerText" x="${gap*(i+1)}" y="405">[batch, ${sizes[i]}]</text>`});$('net').innerHTML=`<g id="edges">${edges}</g>${nodes}`;$('arch').textContent=sizes.join(' → ');$('depthValue').textContent=S.depth+(S.depth===1?' layer':' layers');$('depthStat').textContent=S.depth;$('nodeStat').textContent=S.widths.slice(0,S.depth).reduce((a,b)=>a+b,0);$('paramStat').textContent=params().toLocaleString();activation();checkpoint()}
-function activation(){let c=$('activation'),x=c.getContext('2d'),w=c.width,h=c.height,px=v=>42+(v+5)/10*(w-60),o=A[S.a],yMin=S.a==='relu'?-0.5:-1.5,yMax=S.a==='relu'?5.5:1.5,py=v=>h-34-(v-yMin)/(yMax-yMin)*(h-52);x.clearRect(0,0,w,h);x.fillStyle='#fff';x.fillRect(0,0,w,h);x.strokeStyle='#e5e8e2';[-5,-3,-1,1,3,5].forEach(v=>{x.beginPath();x.moveTo(px(v),18);x.lineTo(px(v),h-34);x.stroke()});(S.a==='relu'?[0,1,3,5]:[-1,0,1]).forEach(v=>{x.beginPath();x.moveTo(42,py(v));x.lineTo(w-18,py(v));x.stroke()});x.strokeStyle='#e86f36';x.lineWidth=3;x.beginPath();for(let v=-5;v<=5;v+=.04){let y=o.f(v);v===-5?x.moveTo(px(v),py(y)):x.lineTo(px(v),py(y))}x.stroke();$('actTitle').textContent=o.title;$('actText').textContent=o.text;$('actRange').textContent=o.range;$('actUse').textContent=o.use;$('actRisk').textContent=o.risk}
-$('depth').oninput=e=>{S.depth=+e.target.value;controls();network()};document.querySelectorAll('.segment').forEach(b=>b.onclick=()=>{S.a=b.dataset.a;document.querySelectorAll('.segment').forEach(x=>x.classList.toggle('active',x===b));activation();checkpoint()});$('forward').onclick=()=>{let e=[...document.querySelectorAll('#edges .edge')];e.forEach((x,i)=>setTimeout(()=>{x.classList.add('signal');setTimeout(()=>x.classList.remove('signal'),500)},i%20*30))};
-function losses(e){return{t:.94*Math.exp(-e/25)+.06,v:.92*Math.exp(-e/22)+.1+(e>72?Math.pow((e-72)/28,1.7)*.12:0)}}function loss(){let c=$('loss'),x=c.getContext('2d'),w=c.width,h=c.height,px=v=>46+v/100*(w-64),py=v=>h-34-v/1.05*(h-52);x.clearRect(0,0,w,h);x.fillStyle='#fff';x.fillRect(0,0,w,h);x.strokeStyle='#e5e8e2';for(let i=0;i<=100;i+=20){x.beginPath();x.moveTo(px(i),18);x.lineTo(px(i),h-34);x.stroke()}[['#e86f36','t'],['#2878b5','v']].forEach(([col,k])=>{x.strokeStyle=col;x.lineWidth=3;x.beginPath();for(let i=0;i<=100;i++){let y=losses(i)[k];i?x.lineTo(px(i),py(y)):x.moveTo(px(i),py(y))}x.stroke()});x.strokeStyle='#17232d';x.beginPath();x.moveTo(px(S.epoch),18);x.lineTo(px(S.epoch),h-34);x.stroke();let l=losses(S.epoch);$('epoch').textContent=S.epoch+' / 100';$('batch').textContent=S.batch+' / 68';$('trainLoss').textContent=l.t.toFixed(3);$('valLoss').textContent=l.v.toFixed(3);evaluate();checkpoint()}function loop(){document.querySelectorAll('#loop div').forEach((x,i)=>x.classList.toggle('active',i===S.loop))}$('oneBatch').onclick=()=>{S.batch=S.batch%68+1;S.loop=(S.loop+1)%4;loss();loop()};$('epochs').onclick=()=>{S.epoch=Math.min(100,S.epoch+10);S.batch=0;loss()};$('reset').onclick=()=>{S.epoch=S.batch=S.loop=0;loss();loop()};
-function evaluate(){let q=.35+.65*(1-Math.exp(-S.epoch/27));$('mae').textContent='$'+Math.round((185000-q*111000)/1000)+'k';$('rmse').textContent='$'+Math.round((255000-q*143000)/1000)+'k';$('r2').textContent=(-.15+q*.88).toFixed(2);let c=$('evaluation'),x=c.getContext('2d'),w=c.width,h=c.height,p=50,cv=v=>p+(v-100)/750*(w-p-18),cy=v=>h-40-(v-100)/750*(h-58);x.clearRect(0,0,w,h);x.fillStyle='#fff';x.fillRect(0,0,w,h);x.strokeStyle='#3f8068';x.setLineDash([6,5]);x.beginPath();x.moveTo(cv(100),cy(100));x.lineTo(cv(850),cy(850));x.stroke();x.setLineDash([]);for(let i=0;i<36;i++){let a=130+(i*137)%690,d=Math.sin(i*2.7)*170*(1.1-q*.7),pred=Math.max(100,Math.min(850,a*q+420*(1-q)+d));x.fillStyle='#2878b5a0';x.beginPath();x.arc(cv(a),cy(pred),5,0,7);x.fill()}}
-function payload(){return{model:'HousePriceRegressor',input_features:18,hidden_layers:S.widths.slice(0,S.depth),hidden_activation:S.a,output_activation:'linear',parameters:params(),epoch:S.epoch,preprocessing:{feature_order:'saved',x_mean:'18 values',x_std:'18 values',target:'standardized log(price)'},weights:'state_dict'}}function checkpoint(){$('code').textContent=JSON.stringify(payload(),null,2)}$('save').onclick=()=>{localStorage.setItem('nnCheckpoint',JSON.stringify({...payload(),widths:S.widths}));$('status').textContent='Checkpoint saved. Change the architecture, then load it.'};$('load').onclick=()=>{let raw=localStorage.getItem('nnCheckpoint');if(!raw){$('status').textContent='Nothing saved yet.';return}let d=JSON.parse(raw);S.depth=d.hidden_layers.length;S.widths=d.widths;S.a=d.hidden_activation;S.epoch=d.epoch;$('depth').value=S.depth;document.querySelectorAll('.segment').forEach(x=>x.classList.toggle('active',x.dataset.a===S.a));controls();network();loss();$('status').textContent='Checkpoint restored: architecture, activation, and epoch loaded.'};controls();network();loss();
+  const $ = id => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const avg = v => v.reduce((s, x) => s + x, 0) / v.length;
+  function nm(v, d = 2) { if (Math.abs(v) < 0.5 * 10 ** -d) v = 0; return v.toFixed(d).replace("-", "−"); }
+  function sg(v, d = 2) { const s = nm(v, d); return s.startsWith("−") ? s : "+" + s; }
+  const money = v => (v < 0 ? "−$" : "$") + Math.round(Math.abs(v)).toLocaleString("en-US");
+  const kmoney = v => (v < 0 ? "−$" : "$") + Math.round(Math.abs(v) / 1000).toLocaleString("en-US") + "k";
+  const paren = (v, d = 2) => `(${sg(v, d)})`;
+
+  // ---------- data ----------
+  const HOUSES = [
+    { bed: 2, bath: 1.00, sqft: 770, price: 180000 },
+    { bed: 3, bath: 1.00, sqft: 1180, price: 221900 },
+    { bed: 3, bath: 1.00, sqft: 1780, price: 229500 },
+    { bed: 3, bath: 1.00, sqft: 1430, price: 310000 },
+    { bed: 3, bath: 2.00, sqft: 1680, price: 510000 },
+    { bed: 3, bath: 2.25, sqft: 2570, price: 538000 },
+    { bed: 5, bath: 2.00, sqft: 1810, price: 530000 },
+    { bed: 4, bath: 3.00, sqft: 1960, price: 604000 },
+    { bed: 4, bath: 3.00, sqft: 2950, price: 650000 },
+    { bed: 3, bath: 2.50, sqft: 3560, price: 662500 }
+  ];
+  const FEATURES = ["bed", "bath", "sqft"];
+  const COLUMNS = [...FEATURES, "price"];
+  const META = {
+    bed: { name: "bedrooms", unit: " bedrooms", raw: v => String(v), stat: v => v.toFixed(2), gap: v => nm(v, 2), axisMax: 6, tick: 1, tickFmt: v => String(v) },
+    bath: { name: "bathrooms", unit: " bathrooms", raw: v => String(v), stat: v => v.toFixed(3).replace(/0$/, ""), gap: v => nm(v, 3).replace(/0$/, ""), axisMax: 4, tick: 1, tickFmt: v => String(v) },
+    sqft: { name: "living area", unit: " sqft", raw: v => Math.round(v).toLocaleString("en-US"), stat: v => v.toLocaleString("en-US", { maximumFractionDigits: 1 }), gap: v => Math.round(v).toLocaleString("en-US"), axisMax: 4000, tick: 1000, tickFmt: v => v.toLocaleString("en-US") },
+    price: { name: "price", unit: "", raw: v => money(v), stat: v => money(v), gap: v => money(v), axisMax: 800000, tick: 200000, tickFmt: v => kmoney(v) }
+  };
+  const STATS = {};
+  COLUMNS.forEach(c => { const v = HOUSES.map(h => h[c]); const mean = avg(v); STATS[c] = { mean, std: Math.sqrt(avg(v.map(x => (x - mean) ** 2))) }; });
+  const zs = (c, v) => (v - STATS[c].mean) / STATS[c].std;
+  const unz = (c, v) => v * STATS[c].std + STATS[c].mean;
+  const X = HOUSES.map(h => FEATURES.map(c => zs(c, h[c])));
+  const Y = HOUSES.map(h => zs("price", h.price));
+  const ALL = HOUSES.map((_, i) => i);
+  const houseLabel = i => "H" + (i + 1);
+  const houseDesc = i => { const h = HOUSES[i]; return `${h.bed} bed · ${h.bath} bath · ${META.sqft.raw(h.sqft)} sqft`; };
+
+  // ---------- the model: any depth and width ----------
+  const sigmoid = z => 1 / (1 + Math.exp(-z));
+  const ACT = {
+    relu: { f: z => Math.max(0, z), d: z => z > 0 ? 1 : 0, name: "ReLU", title: "ReLU: max(0,z)", text: "Negative signals become zero; positive signals pass unchanged.", range: "[0, ∞)", use: "Fast and effective in hidden layers.", risk: "Nodes can become permanently inactive." },
+    tanh: { f: Math.tanh, d: z => 1 - Math.tanh(z) ** 2, name: "tanh", title: "tanh(z)", text: "Smoothly compresses signals around zero.", range: "(−1, 1)", use: "Bounded, zero-centered activations.", risk: "Large inputs saturate and gradients shrink." },
+    sigmoid: { f: sigmoid, d: z => sigmoid(z) * (1 - sigmoid(z)), name: "sigmoid", title: "sigmoid(z)", text: "Compresses signals into a probability-like range.", range: "(0, 1)", use: "Binary classification outputs.", risk: "Saturates and is not zero-centered; deep sigmoid stacks barely learn." }
+  };
+  function mulberry32(seed) {
+    return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  }
+  function initParams(arch, seed) {
+    const r = mulberry32(seed), W = [], b = [];
+    for (let l = 0; l < arch.length - 1; l++) {
+      const lim = Math.sqrt(6 / (arch[l] + arch[l + 1]));
+      W.push(Array.from({ length: arch[l + 1] }, () => Array.from({ length: arch[l] }, () => +((r() * 2 - 1) * lim).toFixed(2))));
+      b.push(Array.from({ length: arch[l + 1] }, () => +((r() * 2 - 1) * 0.1).toFixed(2)));
+    }
+    return { W, b };
+  }
+  const copyParams = P => ({ W: P.W.map(m => m.map(r => [...r])), b: P.b.map(v => [...v]) });
+  const zeroLike = P => ({ W: P.W.map(m => m.map(r => r.map(() => 0))), b: P.b.map(v => v.map(() => 0)) });
+  const lerpParams = (A, B, u) => ({ W: A.W.map((m, l) => m.map((r, j) => r.map((w, k) => w + (B.W[l][j][k] - w) * u))), b: A.b.map((v, l) => v.map((x, j) => x + (B.b[l][j] - x) * u)) });
+  // node layers: 0 = inputs, 1..L-1 = hidden, L = output; W[l] connects node layer l → l + 1
+  function forward(P, x, act) {
+    const f = ACT[act].f, L = P.W.length, as = [x], zs_ = [null];
+    for (let l = 0; l < L; l++) {
+      const prev = as[l];
+      const z = P.W[l].map((row, j) => row.reduce((s, w, k) => s + w * prev[k], P.b[l][j]));
+      zs_.push(z);
+      as.push(l === L - 1 ? z.slice() : z.map(f));
+    }
+    return { x, zs: zs_, as, yhat: as[L][0] };
+  }
+  function gradients(P, rows, act) {
+    const d = ACT[act].d, L = P.W.length, n = rows.length, grads = zeroLike(P);
+    let loss = 0;
+    const traces = rows.map(i => {
+      const t = forward(P, X[i], act), err = t.yhat - Y[i];
+      loss += err * err / n;
+      const deltas = new Array(L + 1);
+      deltas[L] = [2 * err / n];
+      for (let nl = L; nl >= 1; nl--) {
+        const dl = deltas[nl], prev = t.as[nl - 1];
+        dl.forEach((dj, j) => { grads.b[nl - 1][j] += dj; prev.forEach((a, k) => grads.W[nl - 1][j][k] += dj * a); });
+        if (nl > 1) deltas[nl - 1] = prev.map((_, k) => d(t.zs[nl - 1][k]) * dl.reduce((s, dj, j) => s + P.W[nl - 1][j][k] * dj, 0));
+      }
+      t.deltas = deltas; t.err = err;
+      return t;
+    });
+    return { grads, traces, loss };
+  }
+  const update = (P, g, lr) => ({ W: P.W.map((m, l) => m.map((r, j) => r.map((w, k) => w - lr * g.W[l][j][k]))), b: P.b.map((v, l) => v.map((x, j) => x - lr * g.b[l][j])) });
+  const datasetLoss = (P, act) => avg(ALL.map(i => (forward(P, X[i], act).yhat - Y[i]) ** 2));
+  const predictDollars = (P, act, i) => unz("price", forward(P, X[i], act).yhat);
+
+  const lastLayer = () => S.arch.length - 1;
+  function nodeName(nl, j) { return nl === 0 ? FEATURES[j] : nl === lastLayer() ? "ŷ" : `h${nl}.${j + 1}`; }
+  function layerName(nl) { return nl === 0 ? "the inputs" : nl === lastLayer() ? "the output" : `hidden layer ${nl}`; }
+  function parseId(id) { const p = id.split("-").map((v, i) => i ? +v : v); return p[0] === "W" ? { kind: "W", l: p[1], j: p[2], k: p[3] } : { kind: "b", l: p[1], j: p[2] }; }
+  function getP(P, id) { const p = parseId(id); return p.kind === "W" ? P.W[p.l][p.j][p.k] : P.b[p.l][p.j]; }
+  function setP(P, id, v) { const p = parseId(id); if (p.kind === "W") P.W[p.l][p.j][p.k] = v; else P.b[p.l][p.j] = v; }
+  function paramLabel(id) { const p = parseId(id); return p.kind === "W" ? `w(${nodeName(p.l, p.k)}→${nodeName(p.l + 1, p.j)})` : `b(${nodeName(p.l + 1, p.j)})`; }
+  function paramIds(arch) {
+    const ids = [];
+    for (let l = 0; l < arch.length - 1; l++) {
+      for (let j = 0; j < arch[l + 1]; j++) for (let k = 0; k < arch[l]; k++) ids.push(`W-${l}-${j}-${k}`);
+      for (let j = 0; j < arch[l + 1]; j++) ids.push(`b-${l}-${j}`);
+    }
+    return ids;
+  }
+
+  const S = {
+    house: 5, morph: 0,
+    depth: 2, widths: [4, 4, 4, 4], act: "relu", seed: 23,
+    arch: [3, 4, 4, 1], P: null, P0: null, ids: [],
+    iter: 0, seen: 0, history: [], last: null,
+    lr: 0.1, batch: 10, speed: 1, inspect: "W-0-0-2"
+  };
+
+  // ---------- roadmap ----------
+  const FLOW = [
+    ["Data", "Ten real houses: three inputs (bedrooms, bathrooms, sqft) and one target (price).", "data"],
+    ["Standardize", "Translate every column to 'how unusual is this house?' so all inputs share one scale.", "standardize"],
+    ["Build", "Choose depth, width and activation. Every arrow shows its weight; every neuron shows its bias.", "build"],
+    ["Forward", "Push one house through your network, neuron by neuron, and turn the output back into dollars.", "forward-pass"],
+    ["Graph", "Break one neuron's path to the loss into tiny operations, then pass the blame back with one local rule per operation.", "graph"],
+    ["Backward", "Follow the blame from the error back through every arrow, then update each weight and bias.", "backward"],
+    ["Train", "Repeat forward → loss → backward → update over the 10 houses, animated or fast-forwarded.", "learn"],
+    ["Check", "Measure the miss in dollars and compare with a guess-the-average baseline.", "check"],
+    ["Use", "Price a new house, and see why a checkpoint must store the preprocessing too.", "use"]
+  ];
+  $("steps").innerHTML = FLOW.map((x, i) => `<button class="step ${i ? "" : "active"}" data-i="${i}"><b>0${i + 1}</b>${x[0]}</button>`).join("");
+  function detail(i) {
+    document.querySelectorAll(".step").forEach((x, j) => x.classList.toggle("active", i === j));
+    $("detail").innerHTML = `<h3>${FLOW[i][0]}</h3><p>${FLOW[i][1]} <a href="#${FLOW[i][2]}">Go to section ↓</a></p>`;
+  }
+  document.querySelectorAll(".step").forEach(x => x.onclick = () => detail(+x.dataset.i));
+  detail(0);
+
+  // ---------- 01 data + house pickers ----------
+  const maxPrice = Math.max(...HOUSES.map(h => h.price));
+  $("houseTable").innerHTML = HOUSES.map((h, i) => `<tr><td>${houseLabel(i)}</td><td>${h.bed}</td><td>${h.bath}</td><td>${META.sqft.raw(h.sqft)}</td><td><span class="pricebar" style="width:${Math.round(h.price / maxPrice * 90)}px"></span>${money(h.price)}</td></tr>`).join("");
+  function renderPickers() {
+    document.querySelectorAll("[data-pick]").forEach(el => el.innerHTML = `<span>house:</span>` + ALL.map(i => `<button class="${i === S.house ? "active" : ""}" data-house="${i}" title="${houseDesc(i)} · ${money(HOUSES[i].price)}">${houseLabel(i)}</button>`).join(""));
+  }
+  document.addEventListener("click", e => { const b = e.target.closest("[data-pick] [data-house]"); if (b) selectHouse(+b.dataset.house); });
+
+  // ---------- 02 standardization ----------
+  $("stdGrid").innerHTML = COLUMNS.map(c => `<div class="panel std-card"><h3>${META[c].name}<span id="stdStat-${c}"></span></h3><svg id="stdSvg-${c}" viewBox="0 0 460 150"></svg><div class="std-story" id="stdF-${c}"></div><div class="std-math" id="stdN-${c}"></div></div>`).join("");
+  function stdPos(c, v, t) {
+    const W = 460, pad = 26, inner = W - 2 * pad, mid = W / 2, { mean, std } = STATS[c], max = META[c].axisMax;
+    const A = pad + v / max * inner, B = mid + (v - mean) / max * inner, C = mid + (v - mean) / std / 2.5 * (inner / 2);
+    return t <= 1 ? A + (B - A) * t : B + (C - B) * (t - 1);
+  }
+  function unusualWords(z) {
+    const a = Math.abs(z), dir = z >= 0 ? "above" : "below";
+    return a < 0.25 ? "about average" : a < 0.75 ? `a bit ${dir} average` : a < 1.5 ? `clearly ${dir} average` : `unusually ${z >= 0 ? "high" : "low"}`;
+  }
+  function drawStd(c) {
+    const t = S.morph, W = 460, pad = 26, inner = W - 2 * pad, mid = W / 2, axisY = 122, { mean, std } = STATS[c], m = META[c];
+    const crisp = w => clamp((w - 0.5) * 2, 0, 1), wA = crisp(1 - t), wB = crisp(1 - Math.abs(t - 1)), wC = crisp(t - 1);
+    let html = "";
+    const bandL = stdPos(c, mean - std, t), bandR = stdPos(c, mean + std, t), meanX = stdPos(c, mean, t);
+    html += `<rect class="sd-band" x="${bandL}" y="14" width="${bandR - bandL}" height="${axisY - 14}"/>`;
+    html += `<text class="sd-label" x="${(bandL + bandR) / 2}" y="11" style="fill: var(--blue)">±1 std</text>`;
+    html += `<line class="sd-axis" x1="${pad}" x2="${W - pad}" y1="${axisY}" y2="${axisY}"/>`;
+    const ticks = (w, list) => w > 0.02 ? list.map(([x, label]) => `<g opacity="${w}"><line class="sd-axis" x1="${x}" x2="${x}" y1="${axisY}" y2="${axisY + 5}"/><text class="sd-tick" x="${x}" y="${axisY + 18}">${label}</text></g>`).join("") : "";
+    const listA = [], listB = [], listC = [];
+    for (let v = 0; v <= m.axisMax + 1e-9; v += m.tick) listA.push([pad + v / m.axisMax * inner, m.tickFmt(v)]);
+    for (let v = -m.axisMax / 2; v <= m.axisMax / 2 + 1e-9; v += m.tick) listB.push([mid + v / m.axisMax * inner, (v > 0 ? "+" : v < 0 ? "−" : "") + m.tickFmt(Math.abs(v))]);
+    for (let v = -2; v <= 2; v++) listC.push([mid + v / 2.5 * (inner / 2), v > 0 ? "+" + v : String(v).replace("-", "−")]);
+    html += ticks(wA, listA) + ticks(wB, listB) + ticks(wC, listC);
+    html += `<line class="sd-mean" x1="${meanX}" x2="${meanX}" y1="14" y2="${axisY}"/><text class="sd-label" x="${meanX}" y="27" dx="22">mean</text>`;
+    const counts = {};
+    HOUSES.forEach((h, i) => { const k = Math.round(stdPos(c, h[c], 0) / 13); const n = counts[k] = (counts[k] || 0) + 1; html += `<circle class="sd-dot ${i === S.house ? "sel" : ""}" cx="${stdPos(c, h[c], t)}" cy="${axisY - 10 - (n - 1) * 13}" r="${i === S.house ? 7 : 6}"/>`; });
+    $("stdSvg-" + c).innerHTML = html;
+    const zv = HOUSES.map(h => zs(c, h[c])), zm = avg(zv), zsd = Math.sqrt(avg(zv.map(v => (v - zm) ** 2)));
+    $("stdStat-" + c).textContent = t < 1.5 ? `mean ${m.stat(mean)} · std ${m.stat(std)}` : `mean ${nm(zm)} · std ${nm(zsd)}`;
+    const v = HOUSES[S.house][c], z = zs(c, v), diff = v - mean;
+    $("stdF-" + c).innerHTML = `${houseLabel(S.house)} has <b>${m.raw(v)}</b>${m.unit}: <b>${m.gap(Math.abs(diff))} ${diff >= 0 ? "more" : "less"}</b> than average (${m.stat(mean)}). A typical gap is ${m.stat(std)}, so ${m.gap(Math.abs(diff))} ÷ ${m.stat(std)} = <b>${sg(z)}</b> → ${unusualWords(z)}.`;
+    $("stdN-" + c).textContent = `math: (${m.raw(v)} − ${m.stat(mean)}) ÷ ${m.stat(std)} = ${sg(z)}`;
+  }
+  function renderStd() {
+    const t = S.morph;
+    $("morph").value = t;
+    $("morphStage").textContent = t < 0.5 ? "raw values" : t < 1.5 ? "after − mean (slide): average sits at 0" : "after ÷ std (rescale): typical gap = 1";
+    COLUMNS.forEach(drawStd);
+  }
+  function renderStdTable() {
+    const head = `<thead><tr><th>house</th>${COLUMNS.map(c => `<th>${c}</th><th style="color: var(--blue)">${c}′</th>`).join("")}</tr></thead>`;
+    const body = HOUSES.map((h, i) => `<tr><td>${houseLabel(i)}</td>${COLUMNS.map(c => `<td>${c === "price" ? kmoney(h[c]) : META[c].raw(h[c])}</td><td class="z">${sg(zs(c, h[c]))}</td>`).join("")}</tr>`).join("");
+    const foot = `<tfoot><tr><td>mean</td>${COLUMNS.map(c => `<td>${c === "price" ? kmoney(STATS[c].mean) : META[c].stat(STATS[c].mean)}</td><td class="z">0.00</td>`).join("")}</tr><tr><td>std</td>${COLUMNS.map(c => `<td>${c === "price" ? kmoney(STATS[c].std) : META[c].stat(STATS[c].std)}</td><td class="z">1.00</td>`).join("")}</tr></tfoot>`;
+    $("stdTable").innerHTML = head + `<tbody>${body}</tbody>` + foot;
+  }
+  function renderWhy() {
+    const h = HOUSES[S.house], parts = (vals, fmt) => {
+      const contrib = vals.map(v => 0.5 * v), total = contrib.reduce((s, v) => s + Math.abs(v), 0);
+      return FEATURES.map((c, k) => `<div class="share"><span>${c}</span><i style="width:${Math.max(1, Math.abs(contrib[k]) / total * 100)}%"></i><span>${fmt(contrib[k])}</span></div>`).join("") + `<p class="small" style="margin: 4px 0 0">share: ${FEATURES.map((c, k) => `${c} ${Math.round(Math.abs(contrib[k]) / total * 100)}%`).join(" · ")}</p>`;
+    };
+    $("why").innerHTML = `<div><h4>raw × 0.5 (${houseLabel(S.house)})</h4>${parts(FEATURES.map(c => h[c]), v => nm(v, 1))}</div><div><h4>standardized × 0.5</h4>${parts(X[S.house], v => sg(v))}</div>`;
+  }
+  $("morph").oninput = e => { S.morph = +e.target.value; renderStd(); };
+  document.querySelectorAll("[data-morph]").forEach(b => b.onclick = () => morphTo(+b.dataset.morph));
+  let morphToken = 0;
+  function morphTo(target, then) {
+    const token = ++morphToken, from = S.morph, dur = REDUCED ? 0 : Math.abs(target - from) * 900, t0 = performance.now();
+    const frame = now => {
+      if (token !== morphToken) return;
+      const u = dur ? Math.min(1, (now - t0) / dur) : 1;
+      S.morph = from + (target - from) * (u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2);
+      renderStd();
+      if (u < 1) requestAnimationFrame(frame); else if (then) setTimeout(then, 500);
+    };
+    requestAnimationFrame(frame);
+  }
+  $("morphPlay").onclick = () => { S.morph = 0; renderStd(); morphTo(1, () => morphTo(2)); };
+
+  // ---------- canvas helpers ----------
+  function canvasFrame(canvas, xMin, xMax, yMin, yMax, pad = { l: 56, r: 14, t: 14, b: 30 }) {
+    const ctx = canvas.getContext("2d"), w = canvas.width, h = canvas.height;
+    const px = v => pad.l + (v - xMin) / (xMax - xMin) * (w - pad.l - pad.r);
+    const py = v => h - pad.b - (v - yMin) / (yMax - yMin) * (h - pad.t - pad.b);
+    ctx.clearRect(0, 0, w, h); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h);
+    ctx.font = "11px DM Mono, monospace"; ctx.lineWidth = 1;
+    return { ctx, w, h, px, py, pad };
+  }
+  function gridLines(fr, xs, ys, xFmt, yFmt) {
+    const { ctx, w, h, px, py, pad } = fr;
+    ctx.strokeStyle = "#e5e8e2"; ctx.fillStyle = "#8a9690";
+    xs.forEach(v => { ctx.beginPath(); ctx.moveTo(px(v), pad.t); ctx.lineTo(px(v), h - pad.b); ctx.stroke(); ctx.textAlign = "center"; ctx.fillText(xFmt(v), px(v), h - 10); });
+    ys.forEach(v => { ctx.beginPath(); ctx.moveTo(pad.l, py(v)); ctx.lineTo(w - pad.r, py(v)); ctx.stroke(); ctx.textAlign = "right"; ctx.fillText(yFmt(v), pad.l - 6, py(v) + 4); });
+    ctx.textAlign = "left";
+  }
+  function drawActCurve(canvas, act, z) {
+    const f = ACT[act].f, lo = act === "relu" ? -0.5 : -1.2, hi = act === "relu" ? 4 : 1.2;
+    const fr = canvasFrame(canvas, -4, 4, lo, hi, { l: 34, r: 10, t: 10, b: 24 }), { ctx, px, py } = fr;
+    gridLines(fr, [-4, -2, 0, 2, 4], act === "relu" ? [0, 2, 4] : [-1, 0, 1], v => "z=" + v, v => v);
+    ctx.strokeStyle = "#e86f36"; ctx.lineWidth = 2.5; ctx.beginPath();
+    for (let v = -4; v <= 4.001; v += 0.05) { const y = f(v); v === -4 ? ctx.moveTo(px(v), py(y)) : ctx.lineTo(px(v), py(y)); }
+    ctx.stroke();
+    if (z === undefined) return;
+    const zc = clamp(z, -4, 4);
+    ctx.fillStyle = "#17232d"; ctx.beginPath(); ctx.arc(px(zc), py(f(zc)), 5, 0, 7); ctx.fill();
+  }
+
+  // ---------- 03 builder ----------
+  function builderControls() {
+    $("layers").innerHTML = S.widths.slice(0, S.depth).map((w, i) => `<div class="layer"><div class="label"><span>hidden ${i + 1}</span><b id="wv${i}">${w} nodes</b></div><input data-i="${i}" type="range" min="4" max="96" step="4" value="${w}"></div>`).join("");
+    $("layers").querySelectorAll("input").forEach(x => x.oninput = e => { const i = +e.target.dataset.i; S.widths[i] = +e.target.value; $("wv" + i).textContent = S.widths[i] + " nodes"; setArch(); });
+  }
+  function renderBuilder() {
+    $("arch").textContent = S.arch.join(" → ");
+    $("depthValue").textContent = S.depth + (S.depth === 1 ? " layer" : " layers");
+    $("depthStat").textContent = S.depth;
+    $("nodeStat").textContent = S.widths.slice(0, S.depth).reduce((a, b) => a + b, 0);
+    $("paramStat").textContent = S.ids.length.toLocaleString();
+    $("labelNote").textContent = S.arch.every(n => n <= 6) ? "Every arrow shows its weight; every neuron shows its bias. Click one to edit it." : "Layers wider than 6 are too dense to label: hover an arrow to see its weight, or click it to edit. Large layers draw 8 of their nodes (⋮ = the rest).";
+    $("segments").querySelectorAll(".segment").forEach(x => x.classList.toggle("active", x.dataset.a === S.act));
+    builderActivation();
+  }
+  function builderActivation() {
+    const c = $("activation"), x = c.getContext("2d"), w = c.width, h = c.height, o = ACT[S.act];
+    const px = v => 42 + (v + 5) / 10 * (w - 60), yMin = S.act === "relu" ? -0.5 : -1.5, yMax = S.act === "relu" ? 5.5 : 1.5, py = v => h - 34 - (v - yMin) / (yMax - yMin) * (h - 52);
+    x.clearRect(0, 0, w, h); x.fillStyle = "#fff"; x.fillRect(0, 0, w, h); x.strokeStyle = "#e5e8e2"; x.lineWidth = 1;
+    [-5, -3, -1, 1, 3, 5].forEach(v => { x.beginPath(); x.moveTo(px(v), 18); x.lineTo(px(v), h - 34); x.stroke(); });
+    (S.act === "relu" ? [0, 1, 3, 5] : [-1, 0, 1]).forEach(v => { x.beginPath(); x.moveTo(42, py(v)); x.lineTo(w - 18, py(v)); x.stroke(); });
+    x.strokeStyle = "#e86f36"; x.lineWidth = 3; x.beginPath();
+    for (let v = -5; v <= 5; v += .04) { const y = o.f(v); v === -5 ? x.moveTo(px(v), py(y)) : x.lineTo(px(v), py(y)); }
+    x.stroke(); x.lineWidth = 1;
+    $("actTitle").textContent = o.title; $("actText").textContent = o.text; $("actRange").textContent = o.range; $("actUse").textContent = o.use; $("actRisk").textContent = o.risk;
+  }
+  $("depth").oninput = e => { S.depth = +e.target.value; builderControls(); setArch(); };
+  $("segments").querySelectorAll(".segment").forEach(b => b.onclick = () => { if (S.act === b.dataset.a) return; S.act = b.dataset.a; refreshAll({ resetTraining: true }); });
+  $("randomize").onclick = $("bwdRandom").onclick = () => { S.seed = 1 + Math.floor(Math.random() * 1e6); S.P = initParams(S.arch, S.seed); refreshAll({ resetTraining: true, newStart: true }); };
+  function setArch() {
+    S.arch = [3, ...S.widths.slice(0, S.depth), 1];
+    S.ids = paramIds(S.arch);
+    if (!S.ids.includes(S.inspect)) S.inspect = S.ids[0];
+    S.P = initParams(S.arch, S.seed);
+    refreshAll({ resetTraining: true, rebuild: true, newStart: true });
+  }
+
+  // ---------- network diagram (any architecture) ----------
+  const ease = u => u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2;
+  function tween(runner, ctx, dur, fn) {
+    return new Promise(res => {
+      if (ctx.gen !== runner.gen) return res();
+      if (dur <= 0) { fn(1); return res(); }
+      const t0 = performance.now();
+      const frame = now => { if (ctx.gen !== runner.gen) return res(); const u = Math.min(1, (now - t0) / dur); fn(ease(u)); u < 1 ? requestAnimationFrame(frame) : res(); };
+      requestAnimationFrame(frame);
+    });
+  }
+  const pulseR = v => 3 + 6 * Math.min(1, Math.abs(v) / 1.2);
+  const signCls = v => Math.abs(v) < 1e-9 ? "zero" : v > 0 ? "pos" : "neg";
+
+  function makeNet(svg) {
+    const arch = S.arch.slice(), L = arch.length - 1;
+    const drawn = arch.map(n => n <= 9 ? [...Array(n).keys()] : [0, 1, 2, 3, null, n - 4, n - 3, n - 2, n - 1]);
+    const maxSlots = Math.max(...drawn.map(d => d.length));
+    const gap = 190, x0 = 236, rowGap = maxSlots <= 4 ? 96 : maxSlots <= 6 ? 80 : 60, top = 66;
+    const H = top + rowGap * (maxSlots - 1) + 120, W = x0 + L * gap + 100, midY = top + rowGap * (maxSlots - 1) / 2 + 14;
+    const pos = drawn.map((d, nl) => { const m = {}; d.forEach((idx, s) => { const p = { x: x0 + nl * gap, y: midY + (s - (d.length - 1) / 2) * rowGap }; if (idx === null) m.dots = p; else m[idx] = p; }); return m; });
+    const shown = nl => drawn[nl].filter(i => i !== null);
+    const labelled = l => arch[l] <= 6 && arch[l + 1] <= 6;
+    const nodeLabels = nl => arch[nl] <= 6;
+    const OW = 124, OH = 92;
+    const geo = (l, j, k) => { const a = pos[l][k], b = pos[l + 1][j]; if (!a || !b) return null; return [a.x + (l === 0 ? 26 : 24), a.y, l + 1 === L ? b.x - OW / 2 : b.x - 24, b.y]; };
+    let edges = "", hits = "", labels = "", nodes = "";
+    for (let l = 0; l < L; l++) for (const j of shown(l + 1)) for (const k of shown(l)) {
+      const g = geo(l, j, k), id = `W-${l}-${j}-${k}`, at = `x1="${g[0]}" y1="${g[1]}" x2="${g[2]}" y2="${g[3]}"`;
+      edges += `<line class="w-edge" data-p="${id}" ${at}/>`;
+      hits += `<line class="hit" data-p="${id}" ${at}><title></title></line>`;
+      // near the target, at 1/(sources + 1) of the way back: every label gets its own height
+      const tl = 1 - 1 / (shown(l).length + 1);
+      if (labelled(l)) labels += `<text class="w-label" data-p="${id}" x="${(g[0] + (g[2] - g[0]) * tl).toFixed(1)}" y="${(g[1] + (g[3] - g[1]) * tl + 3.5).toFixed(1)}"></text>`;
+    }
+    for (let nl = 0; nl <= L; nl++) {
+      const x = x0 + nl * gap;
+      nodes += `<text class="layer-title" x="${x}" y="22">${nl === 0 ? "inputs" : nl === L ? "output" : "hidden " + nl}</text><text class="layer-shape" x="${x}" y="${H - 12}">[batch, ${arch[nl]}]</text>`;
+      if (pos[nl].dots) nodes += `<text class="dots" x="${x}" y="${pos[nl].dots.y + 7}">⋮</text>`;
+    }
+    FEATURES.forEach((c, k) => {
+      const { x, y } = pos[0][k];
+      nodes += `<g class="chip"><rect x="22" y="${y - 25}" width="150" height="50" rx="7"/><text class="chip-name" x="34" y="${y - 7}">${META[c].name}</text><text class="chip-raw" data-c="raw-${k}" x="34" y="${y + 13}">—</text><text class="chip-z" data-c="z-${k}" x="162" y="${y + 13}"></text></g>`;
+      nodes += `<circle class="nn-in" cx="${x}" cy="${y}" r="26"/><text class="n-tag" x="${x}" y="${y - 8}">${c}</text><text class="n-val" data-c="in-${k}" x="${x}" y="${y + 10}">—</text>`;
+    });
+    for (let nl = 1; nl < L; nl++) for (const j of shown(nl)) {
+      const { x, y } = pos[nl][j], b = `b-${nl - 1}-${j}`;
+      nodes += `<g class="hn" data-n="${nl}-${j}"><title></title><circle cx="${x}" cy="${y}" r="24"/><text class="n-tag" x="${x}" y="${y - 7}">${nodeName(nl, j)}</text><text class="n-a" x="${x}" y="${y + 10}"></text>${nodeLabels(nl) ? `<text class="n-z" x="${x}" y="${y - 31}"></text>` : ""}</g>`;
+      if (nodeLabels(nl)) nodes += `<text class="b-label" data-p="${b}" x="${x}" y="${y + 39}"></text>`;
+    }
+    const o = pos[L][0];
+    nodes += `<g class="onode" data-n="${L}-0"><rect x="${o.x - OW / 2}" y="${o.y - OH / 2}" width="${OW}" height="${OH}" rx="9"/><text class="n-tag" x="${o.x}" y="${o.y - 28}">ŷ · output</text><text class="o-z" x="${o.x}" y="${o.y - 4}">—</text><text class="o-d" x="${o.x}" y="${o.y + 20}"></text><text class="o-sub" x="${o.x}" y="${o.y + 38}">no activation</text></g>`;
+    nodes += `<text class="b-label" data-p="b-${L - 1}-0" x="${o.x}" y="${o.y - OH / 2 - 10}"></text><text class="o-actual" x="${o.x}" y="${o.y + OH / 2 + 20}"></text><text class="o-miss" x="${o.x}" y="${o.y + OH / 2 + 36}"></text>`;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.style.minWidth = Math.round(W * 0.78) + "px";
+    svg.innerHTML = `<g>${edges}</g><g>${hits}</g><g>${nodes}</g><g>${labels}</g><g class="pulses"></g>`;
+    const q = s => svg.querySelector(s);
+    const edgeEls = {}, biasEls = {}, nodeEls = {};
+    svg.querySelectorAll(".w-edge").forEach(e => edgeEls[e.dataset.p] = { line: e });
+    svg.querySelectorAll(".hit").forEach(e => edgeEls[e.dataset.p].title = e.querySelector("title"));
+    svg.querySelectorAll(".w-label").forEach(e => edgeEls[e.dataset.p].label = e);
+    svg.querySelectorAll(".b-label").forEach(e => biasEls[e.dataset.p] = e);
+    svg.querySelectorAll("[data-n]").forEach(e => nodeEls[e.dataset.n] = e);
+    const api = {
+      arch, L, pos, geo, shown, labelled, svg,
+      matches: () => arch.join() === S.arch.join(),
+      setParams(P) {
+        Object.entries(edgeEls).forEach(([id, e]) => {
+          const v = getP(P, id);
+          e.line.setAttribute("stroke-width", (0.8 + 4.5 * Math.min(1, Math.abs(v) / 1.2)).toFixed(2));
+          e.line.classList.toggle("neg", v < 0);
+          e.title.textContent = `${paramLabel(id)} = ${sg(v)}`;
+          if (e.label) { e.label.textContent = sg(v); e.label.setAttribute("class", "w-label"); }
+        });
+        Object.entries(biasEls).forEach(([id, e]) => { e.textContent = "b " + sg(getP(P, id)); e.setAttribute("class", "b-label"); });
+        Object.entries(nodeEls).forEach(([key, e]) => { const [nl, j] = key.split("-").map(Number), t = e.querySelector("title"); if (t) t.textContent = `${nodeName(nl, j)} · bias ${sg(P.b[nl - 1][j])}`; });
+      },
+      setEdgeLabel(id, text, cls) { const e = edgeEls[id]; if (e && e.label) { e.label.textContent = text; e.label.setAttribute("class", "w-label " + (cls || "")); } },
+      setBiasLabel(id, text, cls) { const e = biasEls[id]; if (e) { e.textContent = text; e.setAttribute("class", "b-label " + (cls || "")); } },
+      edgeIds(l) { return Object.keys(edgeEls).filter(id => id.startsWith(`W-${l}-`)); },
+      clear() {
+        FEATURES.forEach((_, k) => { q(`[data-c="raw-${k}"]`).textContent = "—"; q(`[data-c="z-${k}"]`).textContent = ""; q(`[data-c="in-${k}"]`).textContent = "—"; });
+        for (let nl = 1; nl < L; nl++) for (const j of shown(nl)) { api.setNode(nl, j, { z: null, a: null }); api.setDead(nl, j, false); }
+        svg.querySelectorAll(".zoomed").forEach(e => e.classList.remove("zoomed"));
+        api.setOutput(null); api.setActual("", "");
+        q(".pulses").innerHTML = "";
+      },
+      setChip(k, raw, z) { q(`[data-c="raw-${k}"]`).textContent = raw; q(`[data-c="z-${k}"]`).textContent = z === null ? "" : "→ " + sg(z); },
+      setInput(k, v) { q(`[data-c="in-${k}"]`).textContent = v === null ? "—" : sg(v); },
+      setNode(nl, j, { z, a, back }) {
+        const g = nodeEls[`${nl}-${j}`];
+        if (!g || nl === L) return;
+        const at = g.querySelector(".n-a"), zt = g.querySelector(".n-z");
+        if (a !== undefined) { at.classList.remove("back"); at.textContent = a === null ? "" : sg(a); }
+        if (z !== undefined && zt) { zt.classList.remove("back"); zt.textContent = z === null ? "" : "z " + sg(z); }
+        if (back !== undefined) { at.classList.add("back"); at.textContent = back; if (zt) zt.textContent = ""; }
+      },
+      setDead(nl, j, dead) {
+        const g = nodeEls[`${nl}-${j}`];
+        if (!g) return;
+        g.classList.toggle("dead", dead);
+        if (nl < L) for (const m of shown(nl + 1)) { const e = edgeEls[`W-${nl}-${m}-${j}`]; if (e) e.line.classList.toggle("dead", dead); }
+      },
+      setZoomed(nl, j) { svg.querySelectorAll(".zoomed").forEach(e => e.classList.remove("zoomed")); const g = nodeEls[`${nl}-${j}`]; if (g) g.classList.add("zoomed"); },
+      setOutput(yz, dollars, back) {
+        const oz = q(".o-z");
+        oz.classList.toggle("back", !!back);
+        oz.textContent = back || (yz === null || yz === undefined ? "—" : "ŷ = " + sg(yz));
+        q(".o-d").textContent = dollars === undefined || dollars === null ? "" : money(dollars);
+      },
+      setActual(a, m) { q(".o-actual").textContent = a; q(".o-miss").textContent = m; },
+      select(id) { svg.querySelectorAll(".sel").forEach(e => e.classList.remove("sel")); const e = edgeEls[id]; if (e) { e.line.classList.add("sel"); if (e.label) e.label.classList.add("sel"); } if (biasEls[id]) biasEls[id].classList.add("sel"); },
+      pulses(runner, ctx, list, dur) {
+        const layer = q(".pulses");
+        const els = list.map(p => {
+          const c = document.createElementNS(NS, "circle");
+          c.setAttribute("r", p.r || 5); c.setAttribute("class", "pulse " + (p.cls || "")); c.setAttribute("cx", -99);
+          layer.appendChild(c);
+          let t = null;
+          if (p.label) { t = document.createElementNS(NS, "text"); t.setAttribute("class", "pulse-label " + (p.cls === "back" ? "back" : "")); t.textContent = p.label; t.setAttribute("x", -99); layer.appendChild(t); }
+          return { p, c, t };
+        });
+        const maxDelay = Math.max(0, ...list.map(p => p.delay || 0));
+        return tween(runner, ctx, dur, u => els.forEach(({ p, c, t }) => {
+          const v = clamp((u - (p.delay || 0)) / (1 - maxDelay), 0, 1), x = p.x1 + (p.x2 - p.x1) * v, y = p.y1 + (p.y2 - p.y1) * v;
+          c.setAttribute("cx", x); c.setAttribute("cy", y);
+          if (t) { t.setAttribute("x", x); t.setAttribute("y", y - 9); t.setAttribute("opacity", v > 0.85 ? (1 - v) / 0.15 : 1); }
+        })).then(() => els.forEach(({ c, t }) => { c.remove(); if (t) t.remove(); }));
+      }
+    };
+    return api;
+  }
+
+  // shared animation pieces
+  async function animFeed(net, runner, ctx, i, t, ms) {
+    net.clear();
+    const h = HOUSES[i];
+    FEATURES.forEach((c, k) => net.setChip(k, META[c].raw(h[c]), null));
+    await tween(runner, ctx, ms * 0.3, () => {});
+    FEATURES.forEach((c, k) => net.setChip(k, META[c].raw(h[c]), t.x[k]));
+    await net.pulses(runner, ctx, FEATURES.map((c, k) => ({ x1: 172, y1: net.pos[0][k].y, x2: net.pos[0][k].x - 26, y2: net.pos[0][k].y, r: pulseR(t.x[k]), cls: signCls(t.x[k]) })), ms * 0.7);
+    FEATURES.forEach((c, k) => net.setInput(k, t.x[k]));
+  }
+  async function animLayer(net, runner, ctx, P, t, act, nl, js, ms, withDollars) {
+    const l = nl - 1, list = [], src = net.shown(l), targets = js.filter(j => net.pos[nl][j]);
+    targets.forEach((j, n) => src.forEach(k => { const g = net.geo(l, j, k), v = t.as[l][k] * P.W[l][j][k]; list.push({ x1: g[0], y1: g[1], x2: g[2], y2: g[3], r: pulseR(v), cls: signCls(v), label: v, delay: targets.length > 1 ? Math.min(0.4, n * 0.4 / targets.length) : 0 }); }));
+    const showLabels = net.labelled(l) && list.length <= 12;
+    list.forEach(p => p.label = showLabels ? sg(p.label) : null);
+    await net.pulses(runner, ctx, list, ms);
+    if (ctx.gen !== runner.gen) return;
+    if (nl === net.L) { net.setOutput(t.yhat, withDollars ? unz("price", t.yhat) : null); return; }
+    js.forEach(j => { net.setNode(nl, j, { z: t.zs[nl][j], a: t.as[nl][j] }); net.setDead(nl, j, act === "relu" && t.zs[nl][j] <= 0); });
+  }
+  function fillForward(net, t, act, withDollars) {
+    const i = t.house;
+    FEATURES.forEach((c, k) => { net.setChip(k, META[c].raw(HOUSES[i][c]), t.x[k]); net.setInput(k, t.x[k]); });
+    for (let nl = 1; nl < net.L; nl++) for (const j of net.shown(nl)) { net.setNode(nl, j, { z: t.zs[nl][j], a: t.as[nl][j] }); net.setDead(nl, j, act === "relu" && t.zs[nl][j] <= 0); }
+    net.setOutput(t.yhat, withDollars ? unz("price", t.yhat) : null);
+  }
+  async function animBack(net, runner, ctx, l, valFn, ms, withLabels) {
+    const list = [];
+    net.shown(l + 1).forEach((j, n) => net.shown(l).forEach(k => {
+      const v = valFn(j, k);
+      if (Math.abs(v) < 1e-12) return;
+      const g = net.geo(l, j, k);
+      list.push({ x1: g[2], y1: g[3], x2: g[0], y2: g[1], r: 3 + 6 * Math.min(1, Math.abs(v) / 0.5), cls: "back", label: v, delay: Math.min(0.3, n * 0.08) });
+    }));
+    const showLabels = withLabels && net.labelled(l) && list.length <= 12;
+    list.forEach(p => p.label = showLabels ? sg(p.label, 3) : null);
+    await net.pulses(runner, ctx, list, ms);
+  }
+  // written-out arithmetic for one neuron (capped at 6 terms)
+  function neuronCalc(P, t, nl, j, act) {
+    const l = nl - 1, n = S.arch[l], terms = [];
+    for (let k = 0; k < Math.min(n, 6); k++) terms.push(`${paren(t.as[l][k])}×${paren(P.W[l][j][k])}`);
+    let rest = "";
+    if (n > 6) { let s = 0; for (let k = 6; k < n; k++) s += t.as[l][k] * P.W[l][j][k]; rest = ` + [${n - 6} more: ${sg(s)}]`; }
+    const b = P.b[l][j], z = t.zs[nl][j];
+    const head = `${nodeName(nl, j)}: ${terms.join(" + ")}${rest} ${b < 0 ? "−" : "+"} ${nm(Math.abs(b))} = <b>z ${sg(z)}</b>`;
+    return nl === S.arch.length - 1 ? `<span class="calc">${head} = ŷ</span>` : `<span class="calc">${head} → ${ACT[act].name} → <b>${sg(t.as[nl][j])}</b>${act === "relu" && z <= 0 ? " (off)" : ""}</span>`;
+  }
+  const calcDollars = t => `<span class="calc">price = ŷ × ${money(STATS.price.std)} + ${money(STATS.price.mean)} = ${sg(t.yhat)} × ${money(STATS.price.std)} + ${money(STATS.price.mean)} = <b>${money(unz("price", t.yhat))}</b></span>`;
+  const capFeed = (i, t) => `<p><b>Inputs.</b> ${houseLabel(i)} has ${houseDesc(i)}. The black numbers on the left are its raw values; the <b class="blue">blue numbers</b> are the same values standardized (section 02), meaning "how far from average". Only the blue numbers enter the network:</p><span class="calc">x = [${t.x.map(v => sg(v)).join(", ")}]</span><p class="small">Input nodes do no math. They hold these numbers and send a copy along every outgoing arrow.</p>`;
+
+  // ---------- neuron zoom panel ----------
+  function zoomForward(el, P, t, nl, j, act, first) {
+    const l = nl - 1, n = S.arch[l], L = S.arch.length - 1, isOut = nl === L, b = P.b[l][j], z = t.zs[nl][j], a = t.as[nl][j];
+    const rows = [];
+    for (let k = 0; k < Math.min(n, 6); k++) { const v = t.as[l][k], w = P.W[l][j][k]; rows.push(`<div class="zr"><span>${nodeName(l, k)}</span><span>${sg(v)}</span><span class="arrow"><b>× ${sg(w)}</b></span><span class="res">${sg(v * w)}</span></div>`); }
+    let restSum = 0;
+    for (let k = 6; k < n; k++) restSum += t.as[l][k] * P.W[l][j][k];
+    if (n > 6) rows.push(`<div class="zr"><span>+${n - 6} more</span><span></span><span class="arrow"><b>…</b></span><span class="res">${sg(restSum)}</span></div>`);
+    let sum = 0;
+    for (let k = 0; k < n; k++) sum += t.as[l][k] * P.W[l][j][k];
+    const off = !isOut && act === "relu" && z <= 0;
+    el.innerHTML = `<div class="kicker">Zoom · inside ${isOut ? "the output neuron" : nodeName(nl, j)}</div><h3>${isOut ? "Multiply, add (no activation)" : "Multiply, add, activate"}</h3><p class="small" style="margin: 0">Each row is one incoming arrow: <span class="mono">value × weight on the arrow</span>.</p><div class="zrows">${rows.join("")}</div><ol class="zsteps"><li><b>Multiply</b> each incoming value by the weight on its arrow (the rows above).</li><li><b>Add</b> the products, then add this neuron's bias:<span class="calc">${nm(sum)} ${b < 0 ? "−" : "+"} ${nm(Math.abs(b))} = <b>z = ${sg(z)}</b></span></li>${isOut ? `<li><b>No activation</b> on the output: ŷ = z = ${sg(z)}. Converted to dollars, that is <b>${money(unz("price", z))}</b>.</li>` : `<li><b>Activate:</b> ${ACT[act].name}(${sg(z)}) = <b>a = ${sg(a)}</b>. ${off ? "z is negative, so ReLU outputs 0: this neuron is <b>off</b> for this house and sends nothing forward." : `This a travels out along every arrow leaving ${nodeName(nl, j)}.`}</li>`}</ol>${isOut ? "" : `<canvas width="320" height="150"></canvas>`}${first ? `<p class="small" style="margin: 10px 0 0"><b>Every hidden neuron in every layer repeats exactly these three steps.</b> Only the weights and bias differ, so each neuron reacts to a different pattern.</p>` : ""}`;
+    if (!isOut) drawActCurve(el.querySelector("canvas"), act, z);
+  }
+  function zoomBackward(el, P, t, nl, j, act) {
+    const L = S.arch.length - 1, d = ACT[act].d;
+    if (nl === 0) { el.innerHTML = `<div class="kicker">Zoom</div><p class="small">Input nodes hold data, not parameters, so they need no blame.</p>`; return; }
+    const delta = t.deltas[nl][j], l = nl - 1, n = S.arch[l];
+    let blame;
+    if (nl === L) blame = `<p class="small" style="margin: 0">The output's blame comes straight from the miss:</p><span class="calc">δ(ŷ) = 2 × (ŷ − y) = 2 × (${sg(t.yhat)} − ${paren(Y[t.house])}) = <b>${sg(delta, 3)}</b></span><p class="small">${delta > 0 ? "Positive: the prediction is too high, so things that raised ŷ should shrink." : "Negative: the prediction is too low, so things that raised ŷ should grow."}</p>`;
+    else {
+      const next = S.arch[nl + 1], rows = [];
+      let sum = 0;
+      for (let m = 0; m < next; m++) { const w = P.W[nl][m][j], dm = t.deltas[nl + 1][m]; sum += w * dm; if (m < 6) rows.push(`<div class="zr"><span>→${nodeName(nl + 1, m)}</span><span>${sg(w)}</span><span class="arrow"><b>× δ ${sg(dm, 3)}</b></span><span class="res">${sg(w * dm, 3)}</span></div>`); }
+      if (next > 6) rows.push(`<div class="zr"><span>+${next - 6} more</span><span></span><span class="arrow"><b>…</b></span><span class="res"></span></div>`);
+      const slope = d(t.zs[nl][j]);
+      blame = `<p class="small" style="margin: 0">${nodeName(nl, j)} collects blame from every neuron it feeds: <span class="mono">weight × that neuron's δ</span>.</p><div class="zrows">${rows.join("")}</div><span class="calc">sum = ${sg(sum, 3)} → × slope f′(z) = ${nm(slope, 3)}${act === "relu" ? (slope ? " (was on)" : " (was off → blocked)") : ""} → <b>δ = ${sg(delta, 3)}</b></span>`;
+    }
+    const grows = [];
+    for (let k = 0; k < Math.min(n, 6); k++) { const a = t.as[l][k]; grows.push(`<div class="zr"><span>${nodeName(l, k)}</span><span>${sg(a)}</span><span class="arrow"><b>× δ ${sg(delta, 3)}</b></span><span class="res" style="color: var(--purple)">${sg(a * delta, 3)}</span></div>`); }
+    if (n > 6) grows.push(`<div class="zr"><span>+${n - 6} more</span><span></span><span class="arrow"><b>…</b></span><span class="res"></span></div>`);
+    el.innerHTML = `<div class="kicker" style="color: var(--purple)">Zoom · blame at ${nodeName(nl, j)}</div><h3>δ (blame) = ${sg(delta, 3)}</h3>${blame}<p class="small" style="margin: 12px 0 0"><b>Gradients of the arrows into ${nodeName(nl, j)}</b> = value that came in × δ:</p><div class="zrows">${grows.join("")}</div><p class="small" style="margin: 0">Bias gradient = δ × 1 = ${sg(delta, 3)}.</p>`;
+  }
+
+  // ---------- 04 forward pass ----------
+  const VIEWS = {};
+  const FW = { gen: 0, i: 0, busy: false, phases: [] };
+  function buildFwdPhases() {
+    const L = lastLayer(), ph = [];
+    ph.push({ name: "inputs", cap: t => capFeed(S.house, t), run: (ctx, t) => animFeed(VIEWS.fwd, FW, ctx, S.house, t, 900) });
+    for (let nl = 1; nl < L; nl++) {
+      if (S.arch[nl] <= 4) for (let j = 0; j < S.arch[nl]; j++) ph.push({ name: nodeName(nl, j), zoom: [nl, j], cap: t => `<p><b>Neuron ${nodeName(nl, j)}.</b> One value arrives along each arrow. Each is multiplied by the weight written on that arrow; the products are added together with the neuron's bias (z), and z goes through ${ACT[S.act].name}.</p>${neuronCalc(S.P, t, nl, j, S.act)}${S.act === "relu" && t.zs[nl][j] <= 0 ? `<p class="small">z is negative → ReLU outputs 0 → ${nodeName(nl, j)} is <b>off</b> (grey) for this house.</p>` : ""}`, run: (ctx, t) => animLayer(VIEWS.fwd, FW, ctx, S.P, t, S.act, nl, [j], 1200) });
+      else ph.push({ name: "hidden " + nl, zoom: [nl, 0], cap: t => { const off = t.zs[nl].filter(z => z <= 0).length; return `<p><b>Hidden layer ${nl} (${S.arch[nl]} neurons).</b> Every neuron does the same multiply → add → activate on all ${S.arch[nl - 1]} incoming values at once. The zoom panel shows ${nodeName(nl, 0)}.${S.act === "relu" ? ` ${off} of ${S.arch[nl]} neurons are off (ReLU 0) for this house.` : ""}</p>`; }, run: (ctx, t) => animLayer(VIEWS.fwd, FW, ctx, S.P, t, S.act, nl, [...Array(S.arch[nl]).keys()], 1300) });
+    }
+    ph.push({ name: "output", zoom: [L, 0], cap: t => `<p><b>Output neuron.</b> The same multiply-and-add on the last hidden layer's values, plus its bias. There is <b>no activation</b> here, because a price must be free to land below average (negative) or above it.</p>${neuronCalc(S.P, t, L, 0, S.act)}`, run: (ctx, t) => animLayer(VIEWS.fwd, FW, ctx, S.P, t, S.act, L, [0], 1100, false) });
+    ph.push({ name: "$", cap: t => `<p><b>Back to dollars.</b> The network predicts a standardized price, so undo the standardization with the saved price average and typical gap.</p>${calcDollars(t)}<p class="small">Actual: ${money(HOUSES[S.house].price)} · miss: <b>${money(unz("price", t.yhat) - HOUSES[S.house].price)}</b>. Sections 05 and 06 show how to shrink this miss.</p>`, run: async (ctx, t) => { VIEWS.fwd.setOutput(t.yhat, unz("price", t.yhat)); VIEWS.fwd.setActual("actual " + money(HOUSES[S.house].price), "miss " + money(unz("price", t.yhat) - HOUSES[S.house].price)); } });
+    return ph;
+  }
+  function currentTrace() { const t = forward(S.P, X[S.house], S.act); t.house = S.house; return t; }
+  function resetForward() {
+    FW.gen++; FW.i = 0; FW.busy = false; FW.phases = buildFwdPhases();
+    const net = VIEWS.fwd;
+    net.setParams(S.P); net.clear();
+    $("fwdCaption").innerHTML = `<p><b>Ready.</b> Press <b>Next step</b> to send ${houseLabel(S.house)} (${houseDesc(S.house)}) through your ${S.arch.join(" → ")} network. Every number uses the network's current weights${S.iter ? ` (after ${S.iter} training updates)` : " (random starting values; nothing is trained yet)"}.</p>`;
+    zoomForward($("fwdZoom"), S.P, currentTrace(), 1, 0, S.act, true);
+    net.setZoomed(1, 0);
+    renderFwdDots();
+    renderMatrix();
+  }
+  function renderFwdDots() { $("fwdDots").innerHTML = FW.phases.map((p, n) => `<span class="${n < FW.i ? "done" : ""} ${n === FW.i - 1 ? "now" : ""}">${p.name}</span>`).join(""); }
+  async function fwdNext() {
+    if (FW.busy) return;
+    if (FW.i >= FW.phases.length) resetForward();
+    const ctx = { gen: FW.gen }, ph = FW.phases[FW.i], t = currentTrace();
+    FW.busy = true; FW.i++; renderFwdDots();
+    $("fwdCaption").innerHTML = ph.cap(t);
+    if (ph.zoom) { zoomForward($("fwdZoom"), S.P, t, ph.zoom[0], ph.zoom[1], S.act, ph.zoom[0] === 1 && ph.zoom[1] === 0); VIEWS.fwd.setZoomed(ph.zoom[0], ph.zoom[1]); }
+    await ph.run(ctx, t);
+    if (ctx.gen === FW.gen) FW.busy = false;
+  }
+  $("fwdNext").onclick = fwdNext;
+  $("fwdReset").onclick = resetForward;
+  $("fwdPlay").onclick = async () => {
+    resetForward();
+    const gen = FW.gen;
+    while (FW.i < FW.phases.length && gen === FW.gen) { await fwdNext(); await new Promise(r => setTimeout(r, REDUCED ? 0 : 450)); }
+  };
+  function renderMatrix() {
+    const t = currentTrace(), P = S.P, L = lastLayer(), small = S.arch.every(n => n <= 6);
+    const col = (vals, label) => `<span><span class="mat" style="grid-template-columns: auto">${vals.map(v => `<span>${sg(v)}</span>`).join("")}</span><span class="mat-label">${label}</span></span>`;
+    const mat = (rows, label) => `<span><span class="mat" style="grid-template-columns: repeat(${rows[0].length}, auto)">${rows.flat().map(v => `<span>${sg(v)}</span>`).join("")}</span><span class="mat-label">${label}</span></span>`;
+    const lines = [];
+    for (let l = 0; l < L; l++) {
+      const out = S.arch[l + 1], inn = S.arch[l], src = l === 0 ? "x" : `a${l}`, dst = l === L - 1 ? "ŷ" : `a${l + 1}`, f = l === L - 1 ? "no activation" : ACT[S.act].name;
+      lines.push(small
+        ? `<div class="matrix">${mat(P.W[l], `W${l + 1} [${out}×${inn}]`)}<span class="op">·</span>${col(t.as[l], `${src} [${inn}]`)}<span class="op">+</span>${col(P.b[l], `b${l + 1} [${out}]`)}<span class="op">=</span>${col(t.zs[l + 1], `z [${out}]`)}<span class="op">→ ${f} →</span>${col(t.as[l + 1], `${dst} [${out}]`)}</div>`
+        : `<div class="matrix"><span class="mono">W${l + 1} [${out}×${inn}] · ${src} [${inn}] + b${l + 1} [${out}] → ${f} → ${dst} [${out}]</span><span class="small">(${out * inn + out} parameters)</span></div>`);
+    }
+    lines.push(`<div class="matrix"><span class="mono">ŷ = ${sg(t.yhat)} → <b>${money(unz("price", t.yhat))}</b> · total parameters: ${S.ids.length.toLocaleString()}</span></div>`);
+    $("matrix").innerHTML = lines.join("");
+  }
+
+  // ---------- 05 computation graph ----------
+  const CG = { step: 0, j: 0, gen: 0 };
+  const CG_RULES = {
+    square: ["x²  (square)", "multiplies the blame by 2 × its input"],
+    minus: ["− y  (subtract)", "passes the blame to ŷ unchanged; y is data and needs none"],
+    add: ["+ or Σ  (add)", "passes the blame unchanged to every input"],
+    mul: ["×  (multiply)", "gives each input: blame × the other input"],
+    act: ["f  (activation)", "multiplies the blame by the slope f′(z)"]
+  };
+  function cgData() {
+    const L = lastLayer(), nl = L - 1, src = nl - 1, P = S.P, n = S.arch[src], j = Math.min(CG.j, S.arch[nl] - 1);
+    const t = forward(P, X[S.house], S.act);
+    const z = t.zs[nl][j], a = t.as[nl][j], v = P.W[nl][0][j], vmul = v * a, y = Y[S.house], err = t.yhat - y, slope = ACT[S.act].d(z);
+    const gErr = 2 * err, gYhat = gErr, gPlus = gYhat, gV = gPlus * a, gA = gPlus * v, gZ = gA * slope;
+    const ks = n <= 4 ? [...Array(n).keys()] : [0, 1, 2];
+    const branches = ks.map(k => ({ k, name: nodeName(src, k), a: t.as[src][k], w: P.W[src][j][k], mul: t.as[src][k] * P.W[src][j][k], gW: gZ * t.as[src][k], gA: gZ * P.W[src][j][k] }));
+    let others = null;
+    if (n > 4) { let sum = 0; for (let k = 3; k < n; k++) sum += t.as[src][k] * P.W[src][j][k]; others = { n: n - 3, value: sum }; }
+    return { nl, src, j, neuron: nodeName(nl, j), branches, others, b: P.b[src][j], z, a, v, vmul, rest: t.yhat - vmul, yhat: t.yhat, y, err, loss: err * err, slope, gErr, gYhat, gPlus, gV, gA, gZ };
+  }
+  const CG_STEPS = [
+    { name: "leaves", key: "leaf", cap: d => `<p><b>Start with the leaves</b>: the numbers the calculation is built from.</p><p class="small">the incoming values from ${layerName(d.src)} · ${d.neuron}'s weights <span class="mono">w</span> and bias <span class="mono">b</span> · its output weight into ŷ · <span class="mono">rest</span> = everything else that adds into ŷ (the other neurons and the output bias), lumped into one number · the actual price <span class="mono">y</span>, standardized.</p>` },
+    { name: "×", key: "mul", cap: d => `<p><b>× nodes:</b> each multiplies an incoming value by the weight on its arrow.</p>${d.branches.map(b => `<span class="calc">${b.name}: ${paren(b.a)} × ${paren(b.w)} = ${sg(b.mul)}</span>`).join("")}${d.others ? `<span class="calc">the other ${d.others.n} inputs together: ${sg(d.others.value)}</span>` : ""}` },
+    { name: "Σ", key: "sum", cap: d => `<p><b>Σ node:</b> adds the products and the bias, giving z.</p><span class="calc">z = ${[...d.branches.map(b => sg(b.mul)), ...(d.others ? [sg(d.others.value)] : []), sg(d.b)].join(" ")} = <b>${sg(d.z)}</b></span>` },
+    { name: "f", key: "act", cap: d => `<p><b>f node:</b> the activation. a = ${ACT[S.act].name}(${sg(d.z)}) = <b>${sg(d.a)}</b>.</p>` },
+    { name: "× v", key: "vmul", cap: d => `<p><b>× node:</b> ${d.neuron}'s output times its weight into the output: ${paren(d.a)} × ${paren(d.v)} = <b>${sg(d.vmul)}</b>.</p>` },
+    { name: "+", key: "yhat", cap: d => `<p><b>+ node:</b> add the rest of the network's share: ŷ = ${sg(d.vmul)} + ${paren(d.rest)} = <b>${sg(d.yhat)}</b>, which is ${money(unz("price", d.yhat))}.</p>` },
+    { name: "− y", key: "err", cap: d => `<p><b>− node:</b> the miss: ŷ − y = ${sg(d.yhat)} − ${paren(d.y)} = <b>${sg(d.err)}</b>.</p>` },
+    { name: "²", key: "loss", cap: d => `<p><b>² node:</b> the loss L = (${sg(d.err)})² = <b>${nm(d.loss, 4)}</b>.</p><p class="small">The forward pass is done. Now walk the same graph right → left.</p>` },
+    { name: "∂L = 1", key: "gL", back: true, cap: () => `<p><b>Start at the loss with 1.</b> From now on, the purple <span class="mono">∂</span> on a node means: if this value went up a tiny bit, the loss would change by ∂ times that bit. For L itself, that is exactly 1.</p>` },
+    { name: "back ²", key: "gErr", rule: "square", back: true, cap: d => `<p><b>Back through the ² node.</b> Rule: multiply the blame by 2 × the input.</p><span class="calc">∂ for (ŷ − y) = 1 × 2 × ${paren(d.err)} = <b>${sg(d.gErr, 3)}</b></span>` },
+    { name: "back −", key: "gYhat", rule: "minus", back: true, cap: d => `<p><b>Back through the − node.</b> Subtracting the fixed y does not change how ŷ moves the result, so the blame passes to ŷ unchanged.</p><span class="calc">∂ for ŷ = ${sg(d.gErr, 3)} × 1 = <b>${sg(d.gYhat, 3)}</b></span><p class="small">This is the δ(ŷ) that the backward pass (section 06) starts from.</p>` },
+    { name: "back +", key: "gPlus", rule: "add", back: true, cap: d => `<p><b>Back through the + node.</b> Rule: an add passes the blame unchanged to each input, so both <span class="mono">v·a</span> and <span class="mono">rest</span> get <b>${sg(d.gPlus, 3)}</b>.</p>` },
+    { name: "back × v", key: "gMulV", rule: "mul", back: true, cap: d => `<p><b>Back through the × node.</b> Rule: each input gets the blame × the <i>other</i> input.</p><span class="calc">∂ for the weight = ${sg(d.gPlus, 3)} × a ${paren(d.a)} = <b>${sg(d.gV, 3)}</b> ← gradient of ${paramLabel(`W-${d.nl}-0-${d.j}`)}</span><span class="calc">∂ for a = ${sg(d.gPlus, 3)} × w ${paren(d.v)} = <b>${sg(d.gA, 3)}</b> ← blame for ${d.neuron}'s output</span>` },
+    { name: "back f", key: "gZ", rule: "act", back: true, cap: d => `<p><b>Back through the activation.</b> Rule: multiply by the slope f′(z). ${S.act === "relu" ? (d.slope ? "z was positive, so ReLU's slope is 1." : "z was negative, so ReLU's slope is 0: the blame stops here, and nothing before this point will change for this house.") : `The slope of ${ACT[S.act].name} at z = ${sg(d.z)} is ${nm(d.slope, 3)}.`}</p><span class="calc">∂ for z = ${sg(d.gA, 3)} × ${nm(d.slope, 3)} = <b>${sg(d.gZ, 3)}</b></span><p class="small">This is ${d.neuron}'s δ in the backward pass.</p>` },
+    { name: "back Σ", key: "gSum", rule: "add", back: true, cap: d => `<p><b>Back through the Σ node.</b> Rule: an add passes the blame unchanged, so every product and the bias get <b>${sg(d.gZ, 3)}</b>.</p><span class="calc">∂ for b = <b>${sg(d.gZ, 3)}</b> ← gradient of the bias</span>` },
+    { name: "back × w", key: "gLeaf", rule: "mul", back: true, cap: d => `<p><b>Back through the × nodes.</b> Rule: blame × the other input. For each weight, the other input is the value that came in along its arrow:</p>${d.branches.map(b => `<span class="calc">∂ for ${paramLabel(`W-${d.src}-${d.j}-${b.k}`)} = ${sg(d.gZ, 3)} × ${paren(b.a)} = <b>${sg(b.gW, 4)}</b></span>`).join("")}<p class="small"><b>Done.</b> These are exactly the gradients the backward pass (section 06) writes on the arrows into ${d.neuron}: gradient = δ × incoming value. That shortcut is just these local rules chained together.</p>` }
+  ];
+  function renderCG() {
+    const d = cgData(), seen = new Set(CG_STEPS.slice(0, CG.step).map(s => s.key)), cur = CG_STEPS[CG.step - 1], now = cur ? cur.key : null;
+    const nb = d.branches.length + (d.others ? 1 : 0);
+    const LX = 150, MX = 300, SX = 440, FX = 560, VX = 680, PX = 810, MIX = 940, QX = 1060, W = 1120;
+    const rowY = i => 120 + i * 86, bY = rowY(nb), cy = (rowY(0) + bY) / 2, H = bY + 56, topY = cy - 96;
+    const nodes = [], edges = [];
+    const leaf = (id, x, y, name, value, fk, gk, gval) => nodes.push({ id, kind: "leaf", x, y, name, value, fk, gk, gval });
+    const op = (id, x, y, sym, label, value, fk, gk, gval) => nodes.push({ id, kind: "op", x, y, sym, label, value, fk, gk, gval });
+    d.branches.forEach((b, i) => {
+      const y = rowY(i);
+      leaf(`a${i}`, LX, y - 21, d.src === 0 ? `x ${b.name}` : `a ${b.name}`, b.a, "leaf", "gLeaf", b.gA);
+      leaf(`w${i}`, LX, y + 21, paramLabel(`W-${d.src}-${d.j}-${b.k}`), b.w, "leaf", "gLeaf", b.gW);
+      op(`m${i}`, MX, y, "×", "a·w", b.mul, "mul", "gSum", d.gZ);
+      edges.push([`a${i}`, `m${i}`], [`w${i}`, `m${i}`], [`m${i}`, "sum"]);
+    });
+    if (d.others) { leaf("oth", MX, rowY(d.branches.length), `${d.others.n} more a·w`, d.others.value, "mul", "gSum", d.gZ); edges.push(["oth", "sum"]); }
+    leaf("b", MX, bY, `b(${d.neuron})`, d.b, "leaf", "gSum", d.gZ);
+    op("sum", SX, cy, "Σ", "z", d.z, "sum", "gZ", d.gZ);
+    op("f", FX, cy, S.act === "relu" ? "ReLU" : S.act === "tanh" ? "tanh" : "σ", "a", d.a, "act", "gMulV", d.gA);
+    leaf("v", VX, topY, paramLabel(`W-${d.nl}-0-${d.j}`), d.v, "leaf", "gMulV", d.gV);
+    op("vm", VX, cy, "×", "v·a", d.vmul, "vmul", "gPlus", d.gPlus);
+    leaf("rest", PX, topY, "rest of ŷ", d.rest, "leaf", "gPlus", d.gPlus);
+    op("plus", PX, cy, "+", "ŷ", d.yhat, "yhat", "gYhat", d.gYhat);
+    leaf("y", MIX, topY, "y (actual)", d.y, "leaf", null, 0);
+    op("minus", MIX, cy, "−", "ŷ − y", d.err, "err", "gErr", d.gErr);
+    op("sq", QX, cy, "x²", "L", d.loss, "loss", "gL", 1);
+    edges.push(["b", "sum"], ["sum", "f"], ["f", "vm"], ["v", "vm"], ["vm", "plus"], ["rest", "plus"], ["plus", "minus"], ["y", "minus"], ["minus", "sq"]);
+    const byId = Object.fromEntries(nodes.map(n => [n.id, n]));
+    const unit = (dx, dy) => { const l = Math.hypot(dx, dy) || 1; return [dx / l, dy / l]; };
+    let html = `<defs><marker id="cgArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#8a9690"/></marker></defs>`;
+    html += `<text class="layer-title" x="${LX}" y="24">leaves</text><text class="layer-title" x="${(MX + FX) / 2}" y="24">inside ${d.neuron}</text><text class="layer-title" x="${(VX + PX) / 2}" y="24">output ŷ</text><text class="layer-title" x="${(MIX + QX) / 2}" y="24">loss</text>`;
+    edges.forEach(([from, to]) => {
+      const s = byId[from], e = byId[to];
+      let x1, y1;
+      if (s.kind === "leaf") [x1, y1] = e.y - s.y > 40 && Math.abs(e.x - s.x) < 10 ? [s.x, s.y + 17] : [s.x + 58, s.y];
+      else { const [ux, uy] = unit(e.x - s.x, e.y - s.y); [x1, y1] = [s.x + ux * 24, s.y + uy * 24]; }
+      const [ux, uy] = unit(e.x - x1, e.y - y1), x2 = e.x - ux * 27, y2 = e.y - uy * 27;
+      const cls = s.gk && seen.has(s.gk) ? "back" : seen.has(s.fk) ? "lit" : "";
+      html += `<line class="cg-edge ${cls}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" marker-end="url(#cgArrow)"/>`;
+    });
+    nodes.forEach(n => {
+      const shown = seen.has(n.fk), gshown = n.gk && seen.has(n.gk), hot = now && (now === n.fk || now === n.gk);
+      if (n.kind === "leaf") {
+        html += `<g class="cg-leaf ${hot ? "now" : ""} ${n.id === "y" ? "data" : ""}"><rect x="${n.x - 58}" y="${n.y - 17}" width="116" height="34" rx="6"/><text class="cg-name" x="${n.x}" y="${n.y - 3}">${n.name}</text><text class="cg-val" x="${n.x}" y="${n.y + 12}">${shown ? sg(n.value) : ""}</text></g>`;
+        if (gshown) html += n.x === LX || n.y >= cy ? `<text class="cg-grad left" x="${n.x - 64}" y="${n.y + 4}">∂ ${sg(n.gval, 3)}</text>` : `<text class="cg-grad" x="${n.x}" y="${n.y - 24}">∂ ${sg(n.gval, 3)}</text>`;
+      } else {
+        html += `<g class="cg-op ${hot ? "now" : ""}"><circle cx="${n.x}" cy="${n.y}" r="24"/><text class="cg-sym" x="${n.x}" y="${n.y + 5}" style="${n.sym.length > 2 ? "font-size: 10px" : ""}">${n.sym}</text></g>`;
+        if (shown) html += `<text class="cg-val" x="${n.x}" y="${n.y + 42}">${n.label} = ${n.id === "sq" ? nm(n.value, 4) : sg(n.value)}</text>`;
+        if (gshown) html += `<text class="cg-grad" x="${n.x}" y="${n.y - 32}">∂ ${sg(n.gval, 3)}</text>`;
+      }
+    });
+    const svg = $("cgSvg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.innerHTML = html;
+    $("cgDots").innerHTML = CG_STEPS.map((s, n) => `<span class="${n < CG.step ? "done" : ""} ${n === CG.step - 1 ? "now" : ""}">${s.name}</span>`).join("");
+    $("cgDots").classList.toggle("back", !!(cur && cur.back));
+    $("cgCaption").classList.toggle("back", !!(cur && cur.back));
+    $("cgCaption").innerHTML = cur ? cur.cap(d) : `<p><b>Ready.</b> This graph follows ${d.neuron} (pick another neuron above) for ${houseLabel(S.house)}. Press <b>Next step</b>: eight steps forward to the loss, then eight steps back.</p>`;
+    $("cgRules").innerHTML = `<h3>Local rules for passing blame back</h3>` + Object.entries(CG_RULES).map(([k, [title, text]]) => `<div class="rule ${cur && cur.rule === k ? "active" : ""}"><b>${title}</b>${text}</div>`).join("");
+    const L = lastLayer(), count = Math.min(S.arch[L - 1], 8);
+    $("cgPick").innerHTML = `<span>neuron:</span>` + [...Array(count).keys()].map(j => `<button class="${j === d.j ? "active" : ""}" data-cgj="${j}">${nodeName(L - 1, j)}</button>`).join("");
+  }
+  $("cgPick").onclick = e => { const b = e.target.closest("[data-cgj]"); if (b) { CG.j = +b.dataset.cgj; renderCG(); } };
+  $("cgNext").onclick = () => { CG.gen++; CG.step = CG.step >= CG_STEPS.length ? 0 : CG.step + 1; renderCG(); };
+  $("cgReset").onclick = () => { CG.gen++; CG.step = 0; renderCG(); };
+  $("cgPlay").onclick = async () => {
+    const gen = ++CG.gen;
+    CG.step = 0; renderCG();
+    while (CG.step < CG_STEPS.length && gen === CG.gen) { await new Promise(r => setTimeout(r, REDUCED ? 0 : 1500)); if (gen !== CG.gen) break; CG.step++; renderCG(); }
+  };
+
+  // ---------- 06 backward pass ----------
+  const BW = { gen: 0, i: 0, busy: false, phases: [], G: null, before: null };
+  function bigGradEdge(l, g) { return VIEWS.bwd.edgeIds(l).sort((a, b) => Math.abs(getP(g, b)) - Math.abs(getP(g, a)))[0]; }
+  function buildBwdPhases() {
+    const L = lastLayer(), ph = [], G = BW.G, t = G.traces[0], net = VIEWS.bwd, d = ACT[S.act].d;
+    ph.push({ name: "recap", cap: () => {
+      const pred = unz("price", t.yhat), act = HOUSES[S.house].price, b = BW.before;
+      return `<p><b>Where we start: the forward pass result.</b> ${houseLabel(S.house)}: predicted <b>${money(pred)}</b>, actual <b>${money(act)}</b>, a miss of ${money(pred - act)}.</p><span class="calc">loss = (ŷ − y)² = (${sg(t.yhat)} − ${paren(Y[S.house])})² = <b>${nm(G.loss, 4)}</b></span>${b ? `<p class="small">After the update: the loss went from ${nm(b.loss, 4)} to <b>${nm(G.loss, 4)}</b> and the miss from ${money(b.miss)} to <b>${money(pred - act)}</b>.</p>` : `<p class="small">Goal: for every weight and bias, find which way to nudge it to make this loss smaller.</p>`}`;
+    }, run: async () => { fillForward(net, t, S.act, true); net.setActual("actual " + money(HOUSES[S.house].price), "miss " + money(unz("price", t.yhat) - HOUSES[S.house].price)); } });
+    ph.push({ name: "δ ŷ", zoom: [L, 0], cap: () => `<p><b>Start at the end: blame at the output.</b> δ ("delta") measures how much the loss would change if this value went up a little. For the output it comes straight from the miss:</p><span class="calc">δ(ŷ) = 2 × (ŷ − y) = 2 × (${sg(t.yhat)} − ${paren(Y[S.house])}) = <b>${sg(t.deltas[L][0], 3)}</b></span><p class="small">${t.deltas[L][0] > 0 ? "Positive → the prediction is too high." : "Negative → the prediction is too low."} Now this blame flows backwards through the arrows.</p>`, run: async () => net.setOutput(null, null, "δ " + sg(t.deltas[L][0], 3)) });
+    for (let nl = L; nl >= 1; nl--) {
+      const l = nl - 1;
+      ph.push({ name: `g → ${nl === L ? "ŷ" : "h" + nl}`, zoom: [nl, 0], cap: () => {
+        const ex = bigGradEdge(l, G.grads), p = parseId(ex);
+        return `<p><b>Gradients of the arrows into ${layerName(nl)}.</b> Rule: <span class="mono">g = (value that came in along the arrow) × δ of the neuron it points to</span>. The labels now show <span class="mono">w · <span class="purple">g</span></span>.</p><span class="calc">e.g. ${paramLabel(ex)}: ${paren(t.as[l][p.k])} × δ ${paren(t.deltas[nl][p.j], 3)} = <b class="purple">g ${sg(getP(G.grads, ex), 3)}</b></span><p class="small">Bias gradient = δ (a bias is like an arrow whose value is always 1). Sign rule: g &gt; 0 → this number should go <b>down</b>; g &lt; 0 → <b>up</b>; g = 0 → it had no effect.</p>`;
+      }, run: async ctx => {
+        net.edgeIds(l).forEach(id => net.setEdgeLabel(id, `${sg(getP(S.P, id))} · ${sg(getP(G.grads, id), 3)}`, "grad"));
+        for (const j of net.shown(nl)) net.setBiasLabel(`b-${l}-${j}`, `b ${sg(S.P.b[l][j])} · g ${sg(G.grads.b[l][j], 3)}`, "grad");
+        await animBack(net, BW, ctx, l, (j, k) => getP(G.grads, `W-${l}-${j}-${k}`), 1100, false);
+      } });
+      if (nl > 1) ph.push({ name: `δ h${nl - 1}`, zoom: [nl - 1, 0], cap: () => {
+        const offN = t.zs[nl - 1].filter(z => d(z) === 0).length;
+        return `<p><b>Pass the blame back to ${layerName(nl - 1)}.</b> Each neuron collects blame from the neurons it feeds, <span class="mono">Σ (weight × their δ)</span>, then multiplies by the slope of its activation f′(z).</p><span class="calc">δ = f′(z) × Σ w × δ_next</span><p class="small">${S.act === "relu" ? `ReLU's slope is 1 if the neuron was on and 0 if it was off, so off neurons get <b>no blame</b> (${offN} of ${S.arch[nl - 1]} here) and the arrows into them won't change for this house.` : `${ACT[S.act].name}'s slope is never exactly 0, but it gets tiny when z is far from 0.`} The zoom panel shows the sum for ${nodeName(nl - 1, 0)}.</p>`;
+      }, run: async ctx => {
+        await animBack(net, BW, ctx, l, (j, k) => S.P.W[l][j][k] * t.deltas[nl][j], 1100, true);
+        if (ctx.gen !== BW.gen) return;
+        for (const k of net.shown(nl - 1)) { net.setNode(nl - 1, k, { back: "δ" + sg(t.deltas[nl - 1][k], 2) }); net.setDead(nl - 1, k, S.act === "relu" && d(t.zs[nl - 1][k]) === 0); }
+      } });
+    }
+    ph.push({ name: "update", cap: () => {
+      const ex = S.ids.slice().sort((a, b) => Math.abs(getP(G.grads, b)) - Math.abs(getP(G.grads, a)))[0], old = getP(S.P, ex), g = getP(G.grads, ex);
+      return `<p><b>Update every number: new = old − η × g</b> (η = ${nm(S.lr)}). The labels now show <span class="mono">old → new</span>. A big gradient means a big change; a zero gradient means no change.</p><span class="calc">biggest change, ${paramLabel(ex)}: ${sg(old)} − ${nm(S.lr)} × (${sg(g, 4)}) = <b>${sg(old - S.lr * g, 3)}</b></span><p class="small">Press <b>Apply update</b> to write these into the network (one training step on ${houseLabel(S.house)}), then compare the new prediction.</p>`;
+    }, run: async () => {
+      const Pn = update(S.P, G.grads, S.lr);
+      Object.keys(Object.fromEntries(S.ids.map(id => [id, 1]))).forEach(id => { if (id[0] === "W") net.setEdgeLabel(id, `${sg(getP(S.P, id))}→${sg(getP(Pn, id))}`, "upd"); else net.setBiasLabel(id, `b ${sg(getP(S.P, id))}→${sg(getP(Pn, id))}`, "upd"); });
+      $("bwdApply").disabled = false;
+    } });
+    return ph;
+  }
+  function resetBackward(keepBefore) {
+    BW.gen++; BW.i = 0; BW.busy = false;
+    if (!keepBefore) BW.before = null;
+    BW.G = gradients(S.P, [S.house], S.act);
+    BW.G.traces[0].house = S.house;
+    BW.phases = buildBwdPhases();
+    const net = VIEWS.bwd;
+    net.setParams(S.P); net.clear();
+    $("bwdApply").disabled = true;
+    $("bwdCaption").innerHTML = `<p><b>Ready.</b> Press <b>Next step</b> to run the backward pass for ${houseLabel(S.house)} through your ${S.arch.join(" → ")} network.</p>`;
+    zoomBackward($("bwdZoom"), S.P, BW.G.traces[0], lastLayer(), 0, S.act);
+    renderBwdDots();
+  }
+  function renderBwdDots() { $("bwdDots").innerHTML = BW.phases.map((p, n) => `<span class="${n < BW.i ? "done" : ""} ${n === BW.i - 1 ? "now" : ""}">${p.name}</span>`).join(""); }
+  async function bwdNext() {
+    if (BW.busy) return;
+    if (BW.i >= BW.phases.length) resetBackward();
+    const ctx = { gen: BW.gen }, ph = BW.phases[BW.i];
+    BW.busy = true; BW.i++; renderBwdDots();
+    $("bwdCaption").innerHTML = ph.cap();
+    if (ph.zoom) { zoomBackward($("bwdZoom"), S.P, BW.G.traces[0], ph.zoom[0], ph.zoom[1], S.act); VIEWS.bwd.setZoomed(ph.zoom[0], ph.zoom[1]); }
+    await ph.run(ctx);
+    if (ctx.gen === BW.gen) BW.busy = false;
+  }
+  $("bwdNext").onclick = bwdNext;
+  $("bwdReset").onclick = () => resetBackward();
+  $("bwdPlay").onclick = async () => {
+    resetBackward();
+    const gen = BW.gen;
+    while (BW.i < BW.phases.length && gen === BW.gen) { await bwdNext(); await new Promise(r => setTimeout(r, REDUCED ? 0 : 500)); }
+  };
+  $("bwdApply").onclick = () => {
+    const G = BW.G, t = G.traces[0];
+    const before = { loss: G.loss, miss: unz("price", t.yhat) - HOUSES[S.house].price };
+    abortTraining();
+    commit({ rows: [S.house], Pold: copyParams(S.P), grads: G.grads, traces: G.traces, act: S.act, loss: G.loss, done: 1, sse: 0 });
+    renderAfterUpdate(true, { keepBackward: true });
+    BW.before = before;
+    resetBackward(true);
+    bwdNext();
+  };
+
+  // ---------- 07 training ----------
+  const TR = { gen: 0, busy: false, playing: false, step: null, phases: [], i: 0 };
+  const dur = ms => REDUCED ? 0 : ms / S.speed;
+  const nextRows = () => S.batch === 10 ? ALL.slice() : [S.iter % 10];
+  function newStep() { const rows = nextRows(), res = gradients(S.P, rows, S.act); res.traces.forEach((t, r) => t.house = rows[r]); return { rows, Pold: copyParams(S.P), act: S.act, ...res, done: 0, sse: 0, committed: false }; }
+  function buildPhases(step) {
+    const phases = [], n = step.rows.length, L = lastLayer(), d = ACT[step.act].d, net = VIEWS.trn;
+    step.rows.forEach((i, r) => {
+      const t = step.traces[r];
+      phases.push({ loop: 0, cap: () => capFeed(i, t).replace("<b>Inputs.</b>", `<b>Row ${r + 1} of ${n} → input layer.</b>`), run: ctx => { S.queueCurrent = i; renderQueue(); return animFeed(net, TR, ctx, i, t, dur(900)); } });
+      for (let nl = 1; nl < L; nl++) phases.push({ loop: 0, cap: () => `<p><b>${nl === 1 ? "Inputs" : "Hidden layer " + (nl - 1)} → hidden layer ${nl}.</b> Every value travels along every arrow, multiplied by its weight. Each neuron adds its arrivals and its bias, then applies ${ACT[step.act].name}.</p>${S.arch[nl] <= 4 ? [...Array(S.arch[nl]).keys()].map(j => neuronCalc(step.Pold, t, nl, j, step.act)).join("") : neuronCalc(step.Pold, t, nl, 0, step.act) + `<p class="small">…and the same for the other ${S.arch[nl] - 1} neurons.</p>`}`, run: ctx => animLayer(net, TR, ctx, step.Pold, t, step.act, nl, [...Array(S.arch[nl]).keys()], dur(1300)) });
+      phases.push({ loop: 0, cap: () => `<p><b>Last hidden layer → output.</b> Same multiply-and-add, no activation, then convert to dollars.</p>${neuronCalc(step.Pold, t, L, 0, step.act)}${calcDollars(t)}`, run: ctx => animLayer(net, TR, ctx, step.Pold, t, step.act, L, [0], dur(1000), true) });
+      phases.push({ loop: 1, cap: () => { const err = t.yhat - Y[i]; return `<p><b>Loss for this row.</b> Compare with the actual price, also standardized: y = ${sg(Y[i])}.</p><span class="calc">error = ŷ − y = ${sg(t.yhat)} − ${paren(Y[i])} = ${sg(err)} → squared: <b>${nm(err * err, 3)}</b></span><p class="small">${err > 0 ? "Predicted too high." : "Predicted too low."} Squaring makes every miss positive and punishes big misses most. ${r + 1 < n ? "Next house…" : n > 1 ? "That was the last house in the batch: average the squares to get the loss." : "With batch size 1, this single squared error is the loss."}</p>`; }, run: async ctx => { const err = t.yhat - Y[i]; net.setActual(`actual ${money(HOUSES[i].price)}`, `miss ${money(unz("price", t.yhat) - HOUSES[i].price)} · error² ${nm(err * err, 3)}`); step.done = r + 1; step.sse += err * err; renderQueue(); await tween(TR, ctx, dur(700), () => {}); } });
+    });
+    for (let nl = L; nl >= 1; nl--) {
+      const l = nl - 1;
+      phases.push({ loop: 2, back: true, cap: () => {
+        const offs = nl > 1 ? [...Array(S.arch[nl - 1]).keys()].filter(k => step.traces.every(t => d(t.zs[nl - 1][k]) === 0)).length : 0;
+        return `<p><b>Backward · arrows into ${layerName(nl)}.</b> Each arrow's gradient = Σ over the ${n > 1 ? n + " houses" : "house"} of (value that came in × δ of the neuron it points to). Purple dots carry the gradients back.</p>${nl === L ? `<span class="calc">δ(ŷ) = 2(ŷ − y)/n for each house · summed: ${sg(step.traces.reduce((s, t) => s + t.deltas[L][0], 0), 3)}</span>` : ""}${nl > 1 ? `<p class="small">Then the blame passes on to ${layerName(nl - 1)}: δ = f′(z) × Σ w × δ.${S.act === "relu" && offs ? ` ${offs} neuron(s) were off for every house, so they are blocked.` : ""}</p>` : ""}`;
+      }, run: async ctx => {
+        if (nl === L) net.setOutput(null, null, "δ Σ " + sg(step.traces.reduce((s, t) => s + t.deltas[L][0], 0), 3));
+        await animBack(net, TR, ctx, l, (j, k) => getP(step.grads, `W-${l}-${j}-${k}`), dur(1100), true);
+        if (ctx.gen !== TR.gen || nl === 1) return;
+        for (const k of net.shown(nl - 1)) { const sum = step.traces.reduce((s, t) => s + t.deltas[nl - 1][k], 0), blocked = step.traces.every(t => d(t.zs[nl - 1][k]) === 0); net.setNode(nl - 1, k, { back: blocked && S.act === "relu" ? "δ 0" : "δ" + sg(sum, 2) }); net.setDead(nl - 1, k, blocked && S.act === "relu"); }
+      } });
+    }
+    phases.push({ loop: 3, cap: () => capUpdate(step), run: ctx => animUpdate(ctx, step) });
+    return phases;
+  }
+  function capUpdate(step) {
+    const g = step.grads, best = S.ids.slice().sort((a, b) => Math.abs(getP(g, b)) - Math.abs(getP(g, a)))[0], old = getP(step.Pold, best), gv = getP(g, best);
+    return `<p><b>Update.</b> Every weight and bias takes a small step <i>against</i> its gradient: new = old − η × g. Watch the arrows change thickness and the labels change value.</p><span class="calc">biggest change, ${paramLabel(best)}: ${sg(old, 3)} − ${nm(S.lr)} × (${sg(gv, 4)}) = <b>${sg(old - S.lr * gv, 3)}</b></span><p class="small">${step.rows.length === 1 ? "Batch size 1: the weights change after every single house." : "Batch size 10: one update after looking at all 10 houses."}</p>`;
+  }
+  async function animUpdate(ctx, step) {
+    step.Pnew = update(step.Pold, step.grads, S.lr); step.lr = S.lr;
+    const net = VIEWS.trn;
+    for (let nl = 1; nl < lastLayer(); nl++) for (const j of net.shown(nl)) net.setDead(nl, j, false);
+    await tween(TR, ctx, dur(1000), u => net.setParams(lerpParams(step.Pold, step.Pnew, u)));
+    if (ctx.gen === TR.gen) commit(step);
+  }
+  function commit(step) {
+    if (!step.Pnew) { step.Pnew = update(step.Pold, step.grads, S.lr); step.lr = S.lr; }
+    S.P = step.Pnew; S.iter++; S.seen += step.rows.length; step.committed = true;
+    S.history.push(datasetLoss(S.P, S.act));
+    S.last = step;
+  }
+  function setLoop(n, back) { document.querySelectorAll("#trLoop div").forEach((d, i) => { d.classList.toggle("active", i === n); d.classList.toggle("back", i === n && !!back); }); }
+  async function trStep() {
+    if (TR.busy) return;
+    if (!TR.step || TR.i >= TR.phases.length) { TR.step = newStep(); TR.phases = buildPhases(TR.step); TR.i = 0; VIEWS.trn.setParams(S.P); renderQueue(); }
+    const ctx = { gen: TR.gen }, ph = TR.phases[TR.i], step = TR.step;
+    TR.busy = true; updateTrainButtons();
+    setLoop(ph.loop, ph.back);
+    $("trCaption").innerHTML = ph.cap();
+    $("trCaption").classList.toggle("back", !!ph.back);
+    await ph.run(ctx);
+    if (ctx.gen !== TR.gen) return;
+    TR.i++; TR.busy = false;
+    if (step.committed) renderAfterUpdate(true);
+    updateTrainButtons();
+  }
+  async function trPlay() {
+    if (TR.playing) { TR.playing = false; updateTrainButtons(); return; }
+    TR.playing = true; updateTrainButtons();
+    const gen = TR.gen;
+    while (TR.playing && gen === TR.gen) {
+      await trStep();
+      if (gen !== TR.gen) break;
+      await new Promise(r => setTimeout(r, dur(250)));
+    }
+  }
+  function finishInstantly() {
+    if (TR.step && !TR.step.committed) commit(TR.step);
+    TR.gen++; TR.busy = false; TR.step = null; TR.i = 0;
+  }
+  function abortTraining() { TR.gen++; TR.playing = false; TR.busy = false; TR.step = null; TR.i = 0; }
+  function fastForward(n) {
+    TR.playing = false;
+    const before = copyParams(S.P);
+    finishInstantly();
+    for (let s = 0; s < n; s++) commit(newStep());
+    VIEWS.trn.clear(); setLoop(3);
+    $("trCaption").classList.remove("back");
+    const Lc = S.history[S.history.length - 1];
+    $("trCaption").innerHTML = `<p><b>Fast-forwarded ${n} iteration${n > 1 ? "s" : ""}.</b> Each one ran the same forward → loss → backward → update cycle without animation. The loss is now ${nm(Lc, 4)} (typical miss ≈ ${money(Math.sqrt(Lc) * STATS.price.std)}). Press <b>Step</b> to watch the next iteration in detail.</p>`;
+    const ctx = { gen: TR.gen }, after = copyParams(S.P);
+    tween(TR, ctx, REDUCED ? 0 : 700, u => VIEWS.trn.setParams(lerpParams(before, after, u)));
+    renderAfterUpdate(true, { keepTrainNet: true });
+    renderQueue(); updateTrainButtons();
+  }
+  function resetTrainView(message) {
+    VIEWS.trn.setParams(S.P); VIEWS.trn.clear(); setLoop(-1);
+    $("trCaption").classList.remove("back");
+    $("trCaption").innerHTML = message || `<p><b>Ready to train.</b> Loss on all 10 houses with the current weights: ${nm(S.history[S.history.length - 1], 3)}. Press <b>Step</b> to move one phase at a time, or <b>Play</b> to watch whole iterations.</p>`;
+    renderQueue(); updateTrainButtons();
+  }
+  function updateTrainButtons() {
+    $("trPlay").textContent = TR.playing ? "Pause ❚❚" : "Play ▶";
+    $("trStep").disabled = TR.busy || TR.playing;
+    $("trFinish").disabled = !TR.step || TR.step.committed;
+  }
+  function renderQueue() {
+    const step = TR.step && !TR.step.committed ? TR.step : null, rows = step ? step.rows : nextRows();
+    $("queueNote").textContent = S.batch === 10 ? "Batch = all 10 houses: every row goes through before a single update." : `Batch = 1 house: only ${houseLabel(rows[0])} goes through, then the weights update. The next iteration takes the next row.`;
+    const head = `<thead><tr><th>house</th><th>price</th><th>predicted</th><th>error²</th></tr></thead>`;
+    $("queue").innerHTML = head + "<tbody>" + HOUSES.map((h, i) => {
+      const r = step ? step.rows.indexOf(i) : -1, done = step && r >= 0 && r < step.done, current = step && r >= 0 && S.queueCurrent === i && r >= step.done - 1 && TR.i < TR.phases.length - lastLayer() - 1;
+      const t = done ? step.traces[r] : null;
+      return `<tr class="${rows.includes(i) ? "inbatch" : "idle"} ${current ? "current" : ""}"><td>${houseLabel(i)}</td><td>${kmoney(h.price)}</td><td>${t ? kmoney(unz("price", t.yhat)) : "—"}</td><td>${t ? nm((t.yhat - Y[i]) ** 2, 3) : "—"}</td></tr>`;
+    }).join("") + "</tbody>";
+    if (step && step.done) {
+      const terms = step.traces.slice(0, step.done).map((t, r) => nm((t.yhat - Y[step.rows[r]]) ** 2, 3));
+      $("tally").innerHTML = `Σ error² = ${terms.join(" + ")} = ${nm(step.sse, 3)}${step.done === step.rows.length ? `<br>loss = Σ ÷ n = ${nm(step.sse, 3)} ÷ ${step.rows.length} = <b>${nm(step.sse / step.rows.length, 4)}</b>` : `<br>${step.rows.length - step.done} more row(s) before the loss is complete…`}`;
+    } else $("tally").innerHTML = `Loss on all 10 houses with the current weights: <b>${nm(S.history[S.history.length - 1], 4)}</b>`;
+  }
+  function renderDumbbell() {
+    const fr = canvasFrame($("dumbbell"), 0.4, 10.6, 0, 800000), { ctx, px, py } = fr;
+    gridLines(fr, ALL.map(i => i + 1), [0, 200000, 400000, 600000, 800000], v => "H" + v, v => kmoney(v));
+    ALL.forEach(i => {
+      const x = px(i + 1), a = HOUSES[i].price, p = clamp(predictDollars(S.P, S.act, i), -50000, 850000);
+      ctx.strokeStyle = "#e86f36"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, py(a)); ctx.lineTo(x, py(p)); ctx.stroke();
+      ctx.fillStyle = "#17232d"; ctx.beginPath(); ctx.arc(x, py(a), 6, 0, 7); ctx.fill();
+      ctx.fillStyle = "#fff"; ctx.strokeStyle = "#e86f36"; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(x, py(p), 6, 0, 7); ctx.fill(); ctx.stroke();
+    });
+    ctx.lineWidth = 1;
+  }
+  function renderLossCurve() {
+    const H = S.history, n = Math.max(10, H.length - 1), top = Math.max(0.2, ...H.filter(Number.isFinite)) * 1.05;
+    const fr = canvasFrame($("lossCurve"), 0, n, 0, top), { ctx, px, py } = fr;
+    gridLines(fr, [0, 0.25, 0.5, 0.75, 1].map(f => Math.round(f * n)), [0, top / 2, top].map(v => +v.toFixed(2)), v => v, v => nm(v));
+    ctx.strokeStyle = "#e86f36"; ctx.lineWidth = 2.5; ctx.beginPath();
+    H.forEach((v, i) => i ? ctx.lineTo(px(i), py(Math.min(v, top))) : ctx.moveTo(px(i), py(Math.min(v, top))));
+    ctx.stroke(); ctx.lineWidth = 1;
+    const last = H.length - 1;
+    ctx.fillStyle = "#17232d"; ctx.beginPath(); ctx.arc(px(last), py(Math.min(H[last], top)), 5, 0, 7); ctx.fill();
+    ctx.font = "12px DM Mono, monospace"; ctx.textAlign = px(last) > fr.w - 220 ? "right" : "left";
+    ctx.fillText(`${nm(H[last], 4)}  (≈ ${kmoney(Math.sqrt(H[last]) * STATS.price.std)} typical miss)`, px(last) + (ctx.textAlign === "right" ? -10 : 10), py(Math.min(H[last], top)) - 10);
+    ctx.textAlign = "left";
+  }
+  function previewStep() { const st = newStep(); st.preview = true; st.Pnew = update(st.Pold, st.grads, S.lr); st.lr = S.lr; return st; }
+  function renderParamTable(flash) {
+    const step = S.last;
+    let ids = S.ids;
+    if (ids.length > 60) {
+      ids = step ? ids.slice().sort((a, b) => Math.abs(getP(step.grads, b)) - Math.abs(getP(step.grads, a))).slice(0, 20) : ids.slice(0, 20);
+      if (!ids.includes(S.inspect)) ids = [S.inspect, ...ids.slice(0, 19)];
+    }
+    $("ptableNote").textContent = S.ids.length > 60 ? `new = old − η × gradient. ${S.ids.length.toLocaleString()} parameters in total; showing the 20 with the largest gradients. Click a row to inspect it.` : "new = old − η × gradient. Click a row to inspect it.";
+    $("ptable").innerHTML = `<thead><tr><th>parameter</th><th>old</th><th>gradient</th><th>new</th></tr></thead><tbody>` + ids.map(id => {
+      const sel = id === S.inspect ? "sel" : "";
+      if (!step) return `<tr data-param="${id}" class="${sel}"><td>${paramLabel(id)}</td><td>${sg(getP(S.P, id), 3)}</td><td>—</td><td>—</td></tr>`;
+      return `<tr data-param="${id}" class="${sel}"><td>${paramLabel(id)}</td><td>${sg(getP(step.Pold, id), 3)}</td><td style="color: var(--purple)">${sg(getP(step.grads, id), 4)}</td><td class="${flash ? "flash" : ""}">${sg(getP(step.Pnew, id), 3)}</td></tr>`;
+    }).join("") + "</tbody>";
+  }
+  function deltaBreakdown(P, t, nl, j, act, n) {
+    const L = lastLayer();
+    if (nl === L) return [["δ(ŷ)", `2(ŷ − y)/n = 2(${sg(t.yhat)} − ${paren(Y[t.house])})/${n}: how the loss reacts to the prediction`, t.deltas[L][0]]];
+    let sum = 0;
+    for (let m = 0; m < S.arch[nl + 1]; m++) sum += P.W[nl][m][j] * t.deltas[nl + 1][m];
+    return [
+      ["Σ w × δ", `blame collected from the ${S.arch[nl + 1]} neuron(s) ${nodeName(nl, j)} feeds`, sum],
+      ["f′(z)", `slope of ${ACT[act].name} at z = ${sg(t.zs[nl][j])}${act === "relu" ? (t.zs[nl][j] > 0 ? " (on)" : " (off → blocked)") : ""}`, ACT[act].d(t.zs[nl][j])],
+      [`δ(${nodeName(nl, j)})`, "= Σ × f′(z): this neuron's blame", t.deltas[nl][j]]
+    ];
+  }
+  function renderInspector() {
+    const step = S.last || previewStep(), id = S.inspect, p = parseId(id), n = step.rows.length;
+    const r = Math.max(0, step.rows.indexOf(S.house)), t = step.traces[r], nl = p.l + 1;
+    const rows = deltaBreakdown(step.Pold, t, nl, p.j, step.act, n);
+    const incoming = p.kind === "W" ? t.as[p.l][p.k] : 1;
+    rows.push([p.kind === "W" ? `a(${nodeName(p.l, p.k)})` : "1", p.kind === "W" ? "the value that travelled along this arrow" : "a bias is always multiplied by 1", incoming]);
+    const share = t.deltas[nl][p.j] * incoming, g = getP(step.grads, id), old = getP(step.Pold, id), nw = old - step.lr * g;
+    $("inspector").innerHTML = `<div class="kicker" style="color: var(--purple)">Gradient inspector${step.preview ? " · preview of the next update" : " · last update"}</div><h3>${paramLabel(id)}</h3><p class="small">Gradient = δ of the neuron this ${p.kind === "W" ? "arrow points to" : "bias belongs to"} × ${p.kind === "W" ? "the value that came in along it" : "1"}. Shown for ${houseLabel(t.house)}${n > 1 ? ` (one of the ${n} houses in the batch)` : ""}:</p><div class="chain">${rows.map(([a, b, v]) => `<span>${a}</span><span>${b}</span><span>${sg(v, 3)}</span>`).join("")}</div><span class="calc">${houseLabel(t.house)}'s share = δ ${paren(t.deltas[nl][p.j], 3)} × ${paren(incoming)} = <b>${sg(share, 4)}</b></span>${n > 1 ? `<span class="calc">add all ${n} houses' shares → gradient = <b>${sg(g, 4)}</b></span>` : ""}<span class="calc">update: ${sg(old, 3)} − ${nm(step.lr)} × (${sg(g, 4)}) = <b>${sg(nw, 3)}</b></span><p class="small" style="margin-top: 10px">${Math.abs(g) < 1e-9 ? "Gradient is 0: this number had no effect on the loss for this batch, so it stays put." : g > 0 ? "Gradient is positive: nudging this number up would raise the loss, so it goes <b>down</b>." : "Gradient is negative: nudging this number up would lower the loss, so it goes <b>up</b>."}</p>`;
+    VIEWS.trn.select(id);
+  }
+  function inspect(id) { S.inspect = id; renderParamTable(false); renderInspector(); }
+  $("trNet").addEventListener("click", e => { const el = e.target.closest("[data-p]"); if (el) inspect(el.dataset.p); });
+  $("ptable").addEventListener("click", e => { const el = e.target.closest("[data-param]"); if (el) inspect(el.dataset.param); });
+  $("trStep").onclick = () => trStep();
+  $("trPlay").onclick = () => trPlay();
+  $("trFinish").onclick = () => { TR.playing = false; finishInstantly(); VIEWS.trn.clear(); setLoop(3); $("trCaption").classList.remove("back"); $("trCaption").innerHTML = `<p><b>Iteration finished instantly.</b> The update has been applied. Press <b>Step</b> to animate the next one.</p>`; renderAfterUpdate(true); renderQueue(); updateTrainButtons(); };
+  $("trFF10").onclick = () => fastForward(10);
+  $("trFF100").onclick = () => fastForward(100);
+  $("trReset").onclick = () => { S.P = copyParams(S.P0); refreshAll({ resetTraining: true }); };
+  $("batchSeg").onclick = e => {
+    const b = e.target.closest("[data-b]");
+    if (!b) return;
+    abortTraining();
+    S.batch = +b.dataset.b; renderBatchSeg();
+    resetTrainView(`<p><b>Batch size: ${S.batch === 1 ? "1 house" : "all 10 houses"}.</b> ${S.batch === 1 ? "Each iteration feeds one house and updates the weights right away. Ten iterations make one epoch." : "Each iteration feeds all 10 houses, averages their errors, then makes one update. One iteration = one epoch."} Any half-finished iteration was discarded.</p>`);
+    renderInspector();
+  };
+  function renderBatchSeg() { $("batchSeg").querySelectorAll("[data-b]").forEach(b => b.classList.toggle("active", +b.dataset.b === S.batch)); }
+  document.querySelectorAll(".lr-input").forEach(el => el.oninput = e => { S.lr = +e.target.value; renderLr(); renderInspector(); if (BW.i >= BW.phases.length && BW.phases.length) { BW.i--; bwdNext(); } });
+  function renderLr() { document.querySelectorAll(".lr-input").forEach(el => el.value = S.lr); document.querySelectorAll(".lr-val").forEach(el => el.textContent = nm(S.lr)); }
+  $("speed").oninput = e => { S.speed = +e.target.value; $("speedVal").textContent = S.speed + "×"; };
+
+  // ---------- 08 check ----------
+  function renderCheck() {
+    const preds = ALL.map(i => predictDollars(S.P, S.act, i)), act = HOUSES.map(h => h.price), miss = preds.map((p, i) => p - act[i]);
+    const mae = avg(miss.map(Math.abs)), rmse = Math.sqrt(avg(miss.map(m => m * m))), sst = act.reduce((s, a) => s + (a - STATS.price.mean) ** 2, 0), r2 = 1 - miss.reduce((s, m) => s + m * m, 0) / sst;
+    $("sMae").textContent = kmoney(mae); $("sRmse").textContent = kmoney(rmse); $("sR2").textContent = nm(r2); $("sBase").textContent = kmoney(avg(act.map(a => Math.abs(a - STATS.price.mean))));
+    const maxMiss = Math.max(1, ...miss.map(Math.abs));
+    $("checkTable").innerHTML = `<thead><tr><th>house</th><th>bed·bath·sqft</th><th>actual</th><th>predicted</th><th>miss</th><th style="text-align: left">size of miss</th></tr></thead><tbody>` + ALL.map(i => `<tr><td>${houseLabel(i)}</td><td>${HOUSES[i].bed}·${HOUSES[i].bath}·${HOUSES[i].sqft}</td><td>${money(act[i])}</td><td>${money(preds[i])}</td><td>${money(miss[i])}</td><td style="text-align: left"><span class="missbar" style="width:${Math.abs(miss[i]) / maxMiss * 120}px;background:${miss[i] > 0 ? "var(--orange)" : "var(--blue)"}"></span> ${miss[i] > 0 ? "too high" : "too low"}</td></tr>`).join("") + "</tbody>";
+  }
+
+  // ---------- 09 use ----------
+  const listVals = (v, d = 2) => "[" + v.slice(0, 6).map(x => sg(x, d)).join(", ") + (v.length > 6 ? `, … ${v.length - 6} more` : "") + "]";
+  function renderUse() {
+    const raw = [+$("uBed").value, +$("uBath").value, +$("uSqft").value], forgot = $("uForgot").checked;
+    $("uBedVal").textContent = raw[0]; $("uBathVal").textContent = raw[1]; $("uSqftVal").textContent = raw[2].toLocaleString("en-US");
+    const x = forgot ? raw : raw.map((v, k) => zs(FEATURES[k], v)), t = forward(S.P, x, S.act), price = unz("price", t.yhat), L = lastLayer();
+    let hidden = "";
+    for (let nl = 1; nl < L; nl++) hidden += `<span class="calc">hidden ${nl}: a = ${listVals(t.as[nl])}</span>`;
+    $("uSteps").innerHTML = (forgot
+      ? `<div><b>1 · Standardize: skipped!</b><span class="calc">x = [${raw.map(v => v.toLocaleString("en-US")).join(", ")}]: raw numbers the network has never seen</span></div>`
+      : `<div><b>1 · Standardize with the saved averages and typical gaps</b>${FEATURES.map((c, k) => `<span class="calc">${c}: (${META[c].raw(raw[k])} − ${META[c].stat(STATS[c].mean)}) ÷ ${META[c].stat(STATS[c].std)} = ${sg(x[k])}</span>`).join("")}</div>`)
+      + `<div><b>2 · Forward pass (${S.arch.join(" → ")}, ${ACT[S.act].name})</b>${hidden}<span class="calc">ŷ = ${sg(t.yhat, 3)}</span></div>`
+      + `<div><b>3 · Back to dollars</b><span class="calc">${sg(t.yhat, 3)} × ${money(STATS.price.std)} + ${money(STATS.price.mean)} = ${money(price)}</span></div>`;
+    $("uOut").className = "predict-out" + (forgot ? " bad" : "");
+    $("uOut").innerHTML = `<span>${forgot ? "Prediction without preprocessing: nonsense" : `Predicted price${S.iter ? "" : " (untrained network: train in section 07 first!)"}`}</span><strong>${money(price)}</strong>`;
+    $("ckpt").textContent = JSON.stringify(checkpoint(true), null, 2).replace(/\[\s+([^\[\]{}]*?)\s+\]/g, (_, inner) => "[" + inner.split(/,\s+/).join(", ") + "]");
+  }
+  const r4 = v => Math.round(v * 10000) / 10000;
+  function checkpoint(forDisplay) {
+    const big = forDisplay && S.ids.length > 200;
+    return {
+      model: "HousePriceRegressor",
+      architecture: S.arch,
+      feature_order: ["bedrooms", "bathrooms", "sqft_living"],
+      hidden_activation: S.act,
+      output_activation: "linear",
+      preprocessing: { x_mean: FEATURES.map(c => r4(STATS[c].mean)), x_std: FEATURES.map(c => r4(STATS[c].std)), y_mean: r4(STATS.price.mean), y_std: r4(STATS.price.std) },
+      parameters: big
+        ? { note: `${S.ids.length.toLocaleString()} numbers, too many to show`, W_shapes: S.P.W.map(m => `${m.length}×${m[0].length}`), b_shapes: S.P.b.map(v => String(v.length)) }
+        : { W: S.P.W.map(m => m.map(r => r.map(r4))), b: S.P.b.map(v => v.map(r4)) },
+      trained_iterations: S.iter
+    };
+  }
+  ["uBed", "uBath", "uSqft", "uForgot"].forEach(id => $(id).oninput = renderUse);
+  const CKPT_KEY = "houseNetCheckpointV2";
+  $("save").onclick = () => {
+    try { localStorage.setItem(CKPT_KEY, JSON.stringify({ ...checkpoint(false), depth: S.depth, widths: S.widths, history: S.history, seen: S.seen, batch: S.batch, P0: S.P0 })); $("status").textContent = `Checkpoint saved after ${S.iter} iterations. Reset or change the network, then load it.`; }
+    catch { $("status").textContent = "This browser blocked storage, so the checkpoint could not be saved."; }
+  };
+  $("load").onclick = () => {
+    let d = null;
+    try { d = JSON.parse(localStorage.getItem(CKPT_KEY)); } catch { d = null; }
+    if (!d) { $("status").textContent = "Nothing saved yet."; return; }
+    S.depth = d.depth; S.widths = d.widths; S.act = d.hidden_activation; S.batch = d.batch || S.batch;
+    S.arch = d.architecture; S.ids = paramIds(S.arch);
+    if (!S.ids.includes(S.inspect)) S.inspect = S.ids[0];
+    $("depth").value = S.depth; builderControls();
+    S.P = { W: d.parameters.W, b: d.parameters.b }; S.P0 = d.P0 || copyParams(S.P);
+    refreshAll({ rebuild: true });
+    S.iter = d.trained_iterations; S.history = d.history || [datasetLoss(S.P, S.act)]; S.seen = d.seen || 0; S.last = null;
+    renderBatchSeg(); renderAfterUpdate(false); resetTrainView();
+    $("status").textContent = `Checkpoint restored: ${S.arch.join(" → ")}, ${ACT[S.act].name}, ${S.iter} iterations, all weights, biases and preprocessing numbers.`;
+  };
+
+  // ---------- edit popover (03, 04, 06) ----------
+  const POP = { id: null, ctx: null };
+  function openEdit(id, evt, ctx) {
+    POP.id = id; POP.ctx = ctx;
+    const pop = $("pop");
+    pop.hidden = false;
+    const x = clamp(evt.clientX + 12, 8, window.innerWidth - 300), y = clamp(evt.clientY + 12, 8, window.innerHeight - 190);
+    pop.style.left = x + "px"; pop.style.top = y + "px";
+    renderPop();
+  }
+  function renderPop() {
+    if (!POP.id) return;
+    const id = POP.id, v = getP(S.P, id), p = parseId(id);
+    $("popTitle").textContent = paramLabel(id);
+    $("popRange").value = v; if (document.activeElement !== $("popNum")) $("popNum").value = v.toFixed(2);
+    let info = p.kind === "W" ? `Multiplies the value of ${nodeName(p.l, p.k)} on its way into ${nodeName(p.l + 1, p.j)}.` : `Added to ${nodeName(p.l + 1, p.j)}'s sum before the activation.`;
+    if (POP.ctx === "bwd") {
+      const t = BW.G.traces[0], delta = t.deltas[p.l + 1][p.j], incoming = p.kind === "W" ? t.as[p.l][p.k] : 1, g = getP(BW.G.grads, id);
+      info += ` <br><b>Gradient for ${houseLabel(S.house)}:</b> g = ${p.kind === "W" ? `a(${nodeName(p.l, p.k)}) ${paren(incoming)}` : "1"} × δ(${nodeName(p.l + 1, p.j)}) ${paren(delta, 3)} = <b class="purple">${sg(g, 4)}</b> → ${Math.abs(g) < 1e-9 ? "no change" : g > 0 ? "should go down" : "should go up"}.`;
+    }
+    info += `<br><span style="font-size: 11px">Editing a number restarts the training counters from your edited network.</span>`;
+    $("popInfo").innerHTML = info;
+  }
+  function applyEdit(v) {
+    if (!POP.id || !Number.isFinite(v)) return;
+    setP(S.P, POP.id, clamp(v, -3, 3));
+    refreshAll({ resetTraining: true, newStart: true, keepPop: true });
+    renderPop();
+  }
+  $("popRange").oninput = e => applyEdit(+e.target.value);
+  $("popNum").onchange = e => applyEdit(+e.target.value);
+  $("popClose").onclick = () => { $("pop").hidden = true; POP.id = null; };
+  document.addEventListener("keydown", e => { if (e.key === "Escape") { $("pop").hidden = true; POP.id = null; } });
+  document.addEventListener("pointerdown", e => { if (!$("pop").hidden && !e.target.closest("#pop") && !e.target.closest("[data-p]")) { $("pop").hidden = true; POP.id = null; } });
+  [["net", "build"], ["fwdNet", "fwd"], ["bwdNet", "bwd"]].forEach(([svgId, ctx]) => $(svgId).addEventListener("click", e => {
+    const p = e.target.closest("[data-p]");
+    if (p) { openEdit(p.dataset.p, e, ctx); return; }
+    const n = e.target.closest("[data-n]");
+    if (!n || ctx === "build") return;
+    const [nl, j] = n.dataset.n.split("-").map(Number);
+    if (ctx === "fwd") { zoomForward($("fwdZoom"), S.P, currentTrace(), nl, j, S.act, false); VIEWS.fwd.setZoomed(nl, j); }
+    else { zoomBackward($("bwdZoom"), S.P, BW.G.traces[0], nl, j, S.act); VIEWS.bwd.setZoomed(nl, j); }
+  }));
+  $("forward").onclick = async () => {
+    const net = VIEWS.build, runner = { gen: 0 }, ctx = { gen: 0 };
+    for (let l = 0; l < net.L; l++) {
+      const list = [];
+      net.shown(l + 1).forEach(j => net.shown(l).forEach(k => { const g = net.geo(l, j, k); list.push({ x1: g[0], y1: g[1], x2: g[2], y2: g[3], r: 4, cls: "pos" }); }));
+      await net.pulses(runner, ctx, list, REDUCED ? 0 : 500);
+    }
+  };
+
+  // ---------- orchestration ----------
+  function renderAfterUpdate(flash, opts = {}) {
+    const Lc = S.history[S.history.length - 1];
+    $("mIter").textContent = S.iter;
+    $("mEpoch").textContent = nm(S.seen / 10, S.batch === 10 && S.seen % 10 === 0 ? 0 : 1);
+    $("mLoss").textContent = nm(Lc, 4);
+    $("mRmse").textContent = money(Math.sqrt(Lc) * STATS.price.std);
+    $("trAct").textContent = `${ACT[S.act].name} · ${S.arch.join(" → ")}`;
+    if (!opts.keepTrainNet) VIEWS.trn.setParams(S.P);
+    VIEWS.build.setParams(S.P);
+    renderDumbbell(); renderLossCurve(); renderParamTable(flash); renderInspector();
+    renderCheck(); renderUse(); resetForward(); renderCG();
+    if (!opts.keepBackward) resetBackward();
+  }
+  function refreshAll({ resetTraining = false, rebuild = false, newStart = false, keepPop = false } = {}) {
+    FW.gen++; BW.gen++; abortTraining();
+    if (!keepPop) { $("pop").hidden = true; POP.id = null; }
+    if (rebuild) { VIEWS.build = makeNet($("net")); VIEWS.fwd = makeNet($("fwdNet")); VIEWS.bwd = makeNet($("bwdNet")); VIEWS.trn = makeNet($("trNet")); }
+    if (newStart) S.P0 = copyParams(S.P);
+    if (resetTraining) { S.iter = 0; S.seen = 0; S.last = null; S.history = [datasetLoss(S.P, S.act)]; }
+    renderBuilder();
+    renderAfterUpdate(false);
+    resetTrainView();
+  }
+  function selectHouse(i) {
+    S.house = i;
+    renderPickers(); renderStd(); renderWhy(); resetForward(); renderCG(); resetBackward(); renderInspector();
+  }
+
+  builderControls(); renderPickers(); renderBatchSeg(); renderLr();
+  $("speedVal").textContent = S.speed + "×";
+  renderStd(); renderStdTable(); renderWhy();
+  setArch();
+
+  window.NN = { HOUSES, STATS, X, Y, ACT, S, VIEWS, BW, forward, gradients, update, datasetLoss, initParams, paramIds, getP };
 </script>
-</body></html>
+</body>
+</html>
